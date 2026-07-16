@@ -1,0 +1,206 @@
+[
+    {
+      "id": "strength",
+      "name": "Strength",
+      "description": "Strength {value}: Increases attack damage by {value}.",
+      "type": "stat_modifier",
+      "effect": "modify_damage_given",
+      "stacking": "intensity",
+      "value_default": 1,
+      "notes": "Value can be negative; negative values reduce attack damage."
+    },
+    {
+      "id": "dexterity",
+      "name": "Dexterity",
+      "description": "Dexterity {value}: Increases Block gained from cards by {value}.",
+      "type": "stat_modifier",
+      "effect": "modify_block_gained",
+      "stacking": "intensity",
+      "value_default": 1,
+      "notes": "Value can be negative; negative values reduce Block gained."
+    },
+    {
+      "id": "weak",
+      "name": "Weak",
+      "description": "Weak {value}: Reduces attack damage by 25% for {value} turn(s).",
+      "type": "debuff",
+      "effect": "reduce_damage_dealt_percent",
+      "stacking": "duration",
+      "value_default": 1,
+      "duration_default": 1,
+      "notes": "Stacks only increase duration; the 25% reduction remains constant."
+    },
+    {
+      "id": "vulnerable",
+      "name": "Vulnerable",
+      "description": "Vulnerable {value}: Increases attack damage taken by 50% for {value} turn(s).",
+      "type": "debuff",
+      "effect": "increase_damage_taken_percent",
+      "stacking": "duration",
+      "value_default": 1,
+      "duration_default": 1,
+      "notes": "Stacks only increase duration; the 50% increase remains constant."
+    },
+    {
+      "id": "frail",
+      "name": "Frail",
+      "description": "Frail {value}: Reduces Block gained from cards by 25% for {value} turn(s).",
+      "type": "debuff",
+      "effect": "reduce_block_gained_percent",
+      "stacking": "duration",
+      "value_default": 1,
+      "duration_default": 1,
+      "notes": "Stacks only increase duration; the 25% reduction remains constant."
+    },
+    {
+      "id": "entangled",
+      "name": "Entangled",
+      "description": "Entangled: Cannot play Attack cards this turn.",
+      "type": "debuff",
+      "effect": "prevent_attack_play",
+      "stacking": "none",
+      "value_default": 1,
+      "duration_default": 1,
+      "notes": "Does not stack; lasts 1 turn."
+    },
+    {
+      "id": "angry",
+      "name": "Angry",
+      "description": "Angry {value}: Whenever you take attack damage, gain {value} Strength.",
+      "type": "triggered_ability",
+      "effect": "on_damage_received_gain_strength",
+      "stacking": "intensity",
+      "value_default": 1,
+      "notes": "Triggers upon receiving attack damage."
+    },
+    {
+      "id": "curl_up",
+      "name": "Curl Up",
+      "description": "Curl Up {value}: The next time you take attack damage, gain {value} Block (once per combat).",
+      "type": "triggered_ability",
+      "effect": "on_damage_received_gain_block_once",
+      "stacking": "intensity",
+      "value_default": 3,
+      "notes": "Triggers only once per combat."
+    },
+    {
+      "id": "rage",
+      "name": "Rage",
+      "description": "Rage {value}: Whenever the player plays a Skill card, gain {value} Strength.",
+      "type": "triggered_ability",
+      "effect": "on_skill_played_gain_strength",
+      "stacking": "intensity",
+      "value_default": 2,
+      "notes": "Used by Gremlin Nob."
+    },
+    {
+      "id": "mode_shift",
+      "name": "Mode Shift",
+      "description": "Mode Shift {value}: After taking {value} damage, transform into defensive mode.",
+      "type": "triggered_ability",
+      "effect": "switch_to_defensive_mode_on_threshold",
+      "stacking": "threshold",
+      "value_default": 30,
+      "notes": "Switches immediately when the damage threshold is reached. Threshold can be permanently increased by certain moves."
+    },
+    {
+      "id": "split_acid",
+      "name": "Split (Acid)",
+      "description": "When HP is at or below 50%, forces the next turn's intent to Split (Acid).",
+      "type": "triggered_ability",
+      "effect": "force_split_acid_on_hp_threshold",
+      "stacking": "none",
+      "value_default": 50,
+      "notes": "Used by large/medium Acid Slimes."
+    },
+    {
+      "id": "split_spike",
+      "name": "Split (Spike)",
+      "description": "When HP is at or below 50%, forces the next turn's intent to Split (Spike).",
+      "type": "triggered_ability",
+      "effect": "force_split_spike_on_hp_threshold",
+      "stacking": "none",
+      "value_default": 50,
+      "notes": "Used by large/medium Spike Slimes."
+    },
+    {
+      "id": "split_plus",
+      "name": "Split+",
+      "description": "When HP is at or below 50%, forces the next turn's intent to Split+.",
+      "type": "triggered_ability",
+      "effect": "force_split_plus_on_hp_threshold",
+      "stacking": "none",
+      "value_default": 50,
+      "notes": "Used by the Slime Boss."
+    },
+    {
+      "id": "spore_cloud",
+      "name": "Spore Cloud",
+      "description": "Spore Cloud {value}: On death, apply {value} turns of Vulnerable to the player.",
+      "type": "triggered_ability",
+      "effect": "on_death_apply_vulnerable",
+      "stacking": "intensity",
+      "value_default": 1,
+      "notes": "Used by Fungi Beast."
+    },
+    {
+      "id": "sharp_hide",
+      "name": "Sharp Hide",
+      "description": "Sharp Hide {value}: Whenever the player plays an Attack card, take {value} damage.",
+      "type": "triggered_ability",
+      "effect": "on_attack_played_damage_player",
+      "stacking": "intensity",
+      "value_default": 3,
+      "notes": "Used by The Guardian."
+    },
+    {
+      "id": "steal",
+      "name": "Steal",
+      "description": "Steal {value}: On attack, steal {value} gold from the player.",
+      "type": "triggered_ability",
+      "effect": "on_attack_steal_gold",
+      "stacking": "intensity",
+      "value_default": 15,
+      "notes": "Used by Looter."
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "description": "Gold {value}: On death, drop {value} gold.",
+      "type": "triggered_ability",
+      "effect": "on_death_drop_gold",
+      "stacking": "intensity",
+      "value_default": 0,
+      "notes": "Gold amount can be increased by Steal."
+    },
+    {
+      "id": "metallicize",
+      "name": "Metallicize",
+      "description": "Metallicize {value}: At the end of its turn, gain {value} Block.",
+      "type": "triggered_ability",
+      "effect": "on_turn_end_gain_block",
+      "stacking": "intensity",
+      "value_default": 8,
+      "notes": "Used by Lagavulin."
+    },
+    {
+      "id": "ritual",
+      "name": "Ritual",
+      "description": "Ritual {value}: At the end of its turn, gain {value} Strength.",
+      "type": "triggered_ability",
+      "effect": "on_turn_end_gain_strength",
+      "stacking": "intensity",
+      "value_default": 3,
+      "notes": "Used by Cultist."
+    },
+    {
+      "id": "artifact",
+      "name": "Artifact",
+      "description": "Artifact {value}: Negates the next {value} debuff(s).",
+      "type": "triggered_ability",
+      "effect": "negate_debuff",
+      "stacking": "intensity",
+      "value_default": 1,
+      "notes": "Each stack negates one application of a debuff. Stacks decrease by 1 each time a debuff is blocked."
+    }
+  ]

@@ -1,0 +1,180 @@
+[
+  {
+    "id": "priest",
+    "name": "Priest",
+    "description": "A strange blue humanoid creature with a big smile on its face walks up to you.\n\"Hello there, friend! I'm the Priest! Would you like to try my services?!\" the creature shouts loudly.",
+    "options": [
+      {
+        "text": "Purify: Spend 50 gold, remove a card from your deck",
+        "description": "A cold blue flame envelops you and then dissipates.\nThe creature grins: \"Priest gets it done. Have a nice day!\"",
+        "effects": [
+          { "type": "lose_gold", "value": 50 },
+          { "type": "remove_card", "value": 1 }
+        ]
+      },
+      {
+        "text": "Heal: Spend 35 gold, restore 25% HP",
+        "description": "A warm golden light envelops you and then dissipates.\nThe creature grins: \"Priest is the best healer. Have a nice day!\"",
+        "effects": [
+          { "type": "lose_gold", "value": 35 },
+          { "type": "restore_hp_percent", "value": 25 }
+        ]
+      },
+      {
+        "text": "Leave: Steps +1",
+        "description": "You don't trust this \"priest\" at all and just walk away.",
+        "effects": [
+          { "type": "add_steps", "value": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "shining_light",
+    "name": "Shining Light",
+    "description": "You find a thick beam of light in the center of the room.\nThe beam has a warm, flickering, beautiful pattern, as if inviting you to enter.",
+    "options": [
+      {
+        "text": "Step In: Randomly upgrade 2 cards, lose 20% of max HP",
+        "description": "You step into the light and notice it seems to be absorbed into your body.\nThe light burns fiercely! But the pain quickly fades.\nYou feel refreshed, like getting a well-needed slap in the face to wake up.",
+        "condition": { "type": "has_upgradable_card" },
+        "effects": [
+          { "type": "lose_hp_percent", "value": 20 },
+          { "type": "upgrade_random_cards", "value": 2 }
+        ]
+      },
+      {
+        "text": "Leave: Steps +1",
+        "description": "You walk around the beam, still slightly curious about what would have happened if you had stepped in.",
+        "effects": [
+          { "type": "add_steps", "value": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "slime_world",
+    "name": "World of Slime",
+    "description": "You fall into a puddle.\nBut it's filled with slime!\nYou feel the slime burning you and desperately try to get out.\nYour ears, nose, and whole body are soaked in slime.\nAfter crawling out, you notice your gold seems to be less. Looking back, you see not only your own coins but also many dropped by other unfortunate adventurers.",
+    "options": [
+      {
+        "text": "Collect Gold: Gain 75 gold, lose 11 HP, steps +2",
+        "description": "You manage to retrieve quite a few coins before the prolonged contact with the slime burns your skin away.",
+        "effects": [
+          { "type": "gain_gold", "value": 75 },
+          { "type": "lose_hp", "value": 11 },
+          { "type": "add_steps", "value": 2 }
+        ]
+      },
+      {
+        "text": "Let Go: Lose 20~50 gold",
+        "description": "You decide it's not worth it.",
+        "effects": [
+          { "type": "lose_gold_random", "min": 20, "max": 50 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "living_wall",
+    "name": "Living Wall",
+    "description": "You walk into a dead end. Just as you're about to turn back, walls suddenly crash down from the ceiling!\nThree faces appear on the walls and speak to you:\n\"Forget what you know, and I'll let you pass.\"\n\"Make a change, and I'll show you a new path.\"\n\"If you want to get through, you must grow.\"",
+    "options": [
+      {
+        "text": "Forget: Choose a card to remove from your deck",
+        "description": "The wall in front of you retracts into the ceiling with satisfaction, revealing a path ahead.",
+        "effects": [
+          { "type": "remove_card", "value": 1 }
+        ]
+      },
+      {
+        "text": "Change: Choose a card to transform in your deck",
+        "description": "The wall in front of you retracts into the ceiling with satisfaction, revealing a path ahead.",
+        "effects": [
+          { "type": "transform_card", "value": 1 }
+        ]
+      },
+      {
+        "text": "Grow: Choose a card to upgrade in your deck",
+        "description": "The wall in front of you retracts into the ceiling with satisfaction, revealing a path ahead.",
+        "condition": { "type": "has_upgradable_card" },
+        "effects": [
+          { "type": "upgrade_card", "value": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wandering_merchant",
+    "name": "Wandering Merchant",
+    "description": "During your journey, you encounter a wandering merchant.\nA strong smell of potions surrounds him, making your eyes water.",
+    "options": [
+      {
+        "text": "Buy Potion: Lose 20 gold, gain a random potion",
+        "description": "Although the smell is terrible, the potion itself is fine.",
+        "effects": [
+          { "type": "lose_gold", "value": 20 },
+          { "type": "gain_random_potion", "value": 1 }
+        ]
+      },
+      {
+        "text": "Leave: Steps +1",
+        "description": "You can't stand the smell and just walk away.",
+        "effects": [
+          { "type": "add_steps", "value": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "suspicious_chest",
+    "name": "Chest?",
+    "description": "You find an old wooden chest in the bushes.\nIt looks very safe, not dangerous at all.",
+    "options": [
+      {
+        "text": "Open: Gain a random relic, lose 20 HP",
+        "description": "Just as you open the chest, dense spikes suddenly sprout from it!\nYou can't dodge in time and your hand is badly pierced. Fortunately, the chest isn't empty.",
+        "effects": [
+          { "type": "gain_random_relic", "value": 1 },
+          { "type": "lose_hp", "value": 20 }
+        ]
+      },
+      {
+        "text": "Leave: Steps +1",
+        "description": "Your intuition tells you this chest is definitely suspicious, and it's better to leave.",
+        "effects": [
+          { "type": "add_steps", "value": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "big_fish",
+    "name": "Big Fish",
+    "description": "As you walk down a corridor, you see a banana, a donut, and a box floating in the air.\nNo... on closer look, they are all tied with strings and hanging from holes in the ceiling. As you approach, you hear a giggle from above.\nWhat will you do?",
+    "options": [
+      {
+        "text": "Banana: Restore 1/3 of max HP (rounded down)",
+        "description": "You eat the banana. It is nutritious and seems somewhat magical, restoring your health.",
+        "effects": [
+          { "type": "restore_hp_percent", "value": 33 }
+        ]
+      },
+      {
+        "text": "Donut: Increase max HP by 5",
+        "description": "You eat the donut. It's so delicious! Your max HP increases.",
+        "effects": [
+          { "type": "max_hp_increase", "value": 5 }
+        ]
+      },
+      {
+        "text": "Box: Gain a random relic, add a \"Regret\" card to your deck",
+        "description": "You grab the box and find a relic inside!\nBut you really wanted that donut...\nYour heart is filled with sadness, especially regret.",
+        "effects": [
+          { "type": "gain_random_relic", "value": 1 },
+          { "type": "add_card", "card_id": "regret" }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+********* Start testing of TestRelics *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)
+PASS   : TestRelics::initTestCase()
+PASS   : TestRelics::test_burning_blood_on_combat_end()
+PASS   : TestRelics::test_marble_bag_applies_vulnerable_on_battle_start()
+PASS   : TestRelics::test_lizard_tail_revives_once()
+PASS   : TestRelics::test_old_coin_grants_gold_on_pickup()
+PASS   : TestRelics::test_relic_save_load()
+PASS   : TestRelics::cleanupTestCase()
+Totals: 7 passed, 0 failed, 0 skipped, 0 blacklisted, 3ms
+********* Finished testing of TestRelics *********

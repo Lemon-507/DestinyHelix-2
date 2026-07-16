@@ -1,0 +1,18 @@
+********* Start testing of TestCardText *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)
+PASS   : TestCardText::initTestCase()
+PASS   : TestCardText::test_inflame_gain_strength()
+PASS   : TestCardText::test_inflame_upgraded()
+PASS   : TestCardText::test_pommel_strike_damage_and_draw()
+PASS   : TestCardText::test_pommel_strike_upgraded()
+PASS   : TestCardText::test_bash_applies_vulnerable()
+PASS   : TestCardText::test_thunderclap_all_enemies()
+PASS   : TestCardText::test_body_slam()
+PASS   : TestCardText::test_seeing_red_energy_and_exhaust()
+PASS   : TestCardText::test_burn_end_of_turn()
+PASS   : TestCardText::test_dazed_ethereal()
+PASS   : TestCardText::test_wound_unplayable_only()
+PASS   : TestCardText::test_power_through_adds_wounds()
+PASS   : TestCardText::cleanupTestCase()
+Totals: 14 passed, 0 failed, 0 skipped, 0 blacklisted, 2ms
+********* Finished testing of TestCardText *********

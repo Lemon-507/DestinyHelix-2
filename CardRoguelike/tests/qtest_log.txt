@@ -1,0 +1,12 @@
+********* Start testing of TestEnemies *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)
+PASS   : TestEnemies::initTestCase()
+PASS   : TestEnemies::test_enemy_database_loads_cultist()
+PASS   : TestEnemies::test_cultist_sequence_intents()
+PASS   : TestEnemies::test_jaw_worm_probability_restriction()
+PASS   : TestEnemies::test_cultist_ritual_strength_in_combat()
+PASS   : TestEnemies::test_vulnerable_increases_damage_taken()
+PASS   : TestEnemies::test_weak_reduces_damage_dealt()
+PASS   : TestEnemies::cleanupTestCase()
+Totals: 8 passed, 0 failed, 0 skipped, 0 blacklisted, 0ms
+********* Finished testing of TestEnemies *********

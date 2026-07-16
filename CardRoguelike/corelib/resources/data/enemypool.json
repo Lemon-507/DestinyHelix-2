@@ -1,0 +1,179 @@
+{
+    "description": "Enemy encounter pools for normal, elite, and boss nodes. Used by MapManager to spawn enemies when entering combat nodes.",
+    "pools": {
+      "normal_early": [
+        {
+          "weight": 1,
+          "enemies": [
+            { "id": "cultist" }
+          ]
+        },
+        {
+          "weight": 1,
+          "enemies": [
+            { "id": "jaw_worm" }
+          ]
+        },
+        {
+          "weight": 1,
+          "enemies": [
+            {
+              "random_from": ["red_louse", "green_louse"],
+              "count": 2,
+              "allow_duplicates": true
+            }
+          ]
+        },
+        {
+          "weight": 1,
+          "enemies": [
+            {
+              "random_from": ["spike_slime_medium", "acid_slime_medium"],
+              "count": 1
+            },
+            {
+              "random_from": ["spike_slime_small", "acid_slime_small"],
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "normal_late": [
+        {
+          "weight": 12.5,
+          "enemies": [
+            {
+              "random_from": ["red_louse", "green_louse"],
+              "count": 3,
+              "allow_duplicates": true
+            }
+          ]
+        },
+        {
+          "weight": 12.5,
+          "enemies": [
+            {
+              "random_from": ["spike_slime_large", "acid_slime_large"],
+              "count": 1
+            }
+          ]
+        },
+        {
+          "weight": 12.5,
+          "enemies": [
+            { "id": "looter" }
+          ]
+        },
+        {
+          "weight": 12.5,
+          "enemies": [
+            {
+              "random_from": ["red_slaver", "blue_slaver"],
+              "count": 1
+            }
+          ]
+        },
+        {
+          "weight": 12.5,
+          "enemies": [
+            { "id": "fungi_beast" },
+            { "id": "fungi_beast" }
+          ]
+        },
+        {
+          "weight": 6.25,
+          "enemies": [
+            {
+              "type": "gremlin_group",
+              "description": "4 gremlins randomly picked from [Fat, Mad, Shield, Sneaky, Wizard]. Shield ≤1, Wizard ≤1, Fat ≤2, Mad ≤2, Sneaky ≤2.",
+              "pool": ["fat_gremlin", "mad_gremlin", "shield_gremlin", "sneaky_gremlin", "gremlin_wizard"],
+              "count": 4,
+              "constraints": {
+                "shield_gremlin": { "max": 1 },
+                "gremlin_wizard": { "max": 1 },
+                "fat_gremlin": { "max": 2 },
+                "mad_gremlin": { "max": 2 },
+                "sneaky_gremlin": { "max": 2 }
+              }
+            }
+          ]
+        },
+        {
+          "weight": 6.25,
+          "enemies": [
+            {
+              "random_from": ["spike_slime_small", "acid_slime_small"],
+              "count": 5,
+              "allow_duplicates": true
+            }
+          ]
+        },
+        {
+          "weight": 9.375,
+          "enemies": [
+            {
+              "random_from": ["red_louse", "green_louse", "spike_slime_medium", "acid_slime_medium"],
+              "count": 1
+            },
+            {
+              "random_from": ["red_slaver", "blue_slaver", "looter"],
+              "count": 1
+            }
+          ]
+        },
+        {
+          "weight": 9.375,
+          "enemies": [
+            {
+              "random_from": ["red_louse", "green_louse", "spike_slime_medium", "acid_slime_medium"],
+              "count": 1
+            },
+            {
+              "random_from": ["jaw_worm", "fungi_beast"],
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "elite": [
+        {
+          "weight": 1,
+          "enemies": [
+            { "id": "gremlin_nob" }
+          ]
+        },
+        {
+          "weight": 1,
+          "enemies": [
+            { "id": "sentry", "count": 3 }
+          ]
+        },
+        {
+          "weight": 1,
+          "enemies": [
+            { "id": "lagavulin" }
+          ]
+        }
+      ],
+      "boss": [
+        {
+          "weight": 1,
+          "enemies": [
+            { "id": "hexaghost" }
+          ]
+        },
+        {
+          "weight": 1,
+          "enemies": [
+            { "id": "the_guardian" }
+          ]
+        },
+        {
+          "weight": 1,
+          "enemies": [
+            { "id": "slime_boss" }
+          ]
+        }
+      ]
+    }
+  }

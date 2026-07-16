@@ -1,0 +1,43 @@
+********* Start testing of TestEnemies *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)
+QWARN  : TestEnemies::initTestCase() EnemyDatabase: weighted_random_with_memory uses default_sequence fallback
+PASS   : TestEnemies::initTestCase()
+PASS   : TestEnemies::test_enemy_database_loads_cultist()
+PASS   : TestEnemies::test_cultist_sequence_intents()
+PASS   : TestEnemies::test_jaw_worm_probability_weights_loaded()
+PASS   : TestEnemies::test_jaw_worm_probability_restriction()
+PASS   : TestEnemies::test_jaw_worm_battlefsm_no_double_chomp()
+PASS   : TestEnemies::test_jaw_worm_peek_consume_never_double_chomp()
+PASS   : TestEnemies::test_gremlin_nob_starts_with_bellow()
+PASS   : TestEnemies::test_spike_slime_split_scheduled_at_half_hp()
+PASS   : TestEnemies::test_red_slaver_sequence_after_first_turn()
+PASS   : TestEnemies::test_fungi_beast_rules_parsed()
+PASS   : TestEnemies::test_cultist_ritual_strength_in_combat()
+PASS   : TestEnemies::test_all_alive_enemies_execute_intents()
+PASS   : TestEnemies::test_dead_enemy_skipped_remaining_enemies_still_act()
+PASS   : TestEnemies::test_green_louse_rolls_bite_and_curl_up_at_combat_start()
+PASS   : TestEnemies::test_cultist_and_gremlin_nob_fixed_intent_values()
+PASS   : TestEnemies::test_vulnerable_increases_damage_taken()
+PASS   : TestEnemies::test_weak_reduces_damage_dealt()
+PASS   : TestEnemies::test_guardian_behavior_parsed()
+PASS   : TestEnemies::test_guardian_starts_in_attack_mode()
+PASS   : TestEnemies::test_guardian_mode_shift_at_damage_threshold()
+PASS   : TestEnemies::test_guardian_strengthen_applies_sharp_hide()
+PASS   : TestEnemies::test_guardian_sharp_hide_damages_player_on_attack()
+PASS   : TestEnemies::test_guardian_returns_to_attack_after_double_slash()
+FAIL!  : TestEnemies::test_slime_boss_split_parsed() Compared values are not the same
+   Actual   (data->behavior.splitIntentIndex): -1
+   Expected (3)                              : 3
+unit\test_enemies.cpp(493) : failure location
+FAIL!  : TestEnemies::test_slime_boss_forces_split_intent_at_half_hp() Compared values are not the same
+   Actual   (next.type)              : "add_cards_to_discard"
+   Expected (QStringLiteral("split")): "split"
+unit\test_enemies.cpp(510) : failure location
+FAIL!  : TestEnemies::test_slime_boss_split_spawns_large_slimes() Compared values are not the same
+   Actual   (boss.peekNextIntent().type): "add_cards_to_discard"
+   Expected (QStringLiteral("split"))   : "split"
+unit\test_enemies.cpp(527) : failure location
+PASS   : TestEnemies::test_spike_slime_large_split_spawns_mediums()
+PASS   : TestEnemies::cleanupTestCase()
+Totals: 26 passed, 3 failed, 0 skipped, 0 blacklisted, 9ms
+********* Finished testing of TestEnemies *********

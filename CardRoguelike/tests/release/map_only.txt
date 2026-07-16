@@ -1,0 +1,14 @@
+********* Start testing of TestMapShrink *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)
+PASS   : TestMapShrink::initTestCase()
+PASS   : TestMapShrink::testMapGenerationCountsAndFixedPositions()
+PASS   : TestMapShrink::testInitialPlacementMovementAndStepCounting()
+PASS   : TestMapShrink::testExploredNodeUsesEmptyStepCostAndDamage()
+PASS   : TestMapShrink::testShrinkTriggersAtStepThresholds()
+PASS   : TestMapShrink::testShrinkDamageValues()
+PASS   : TestMapShrink::testShrinkZoneEmptyNodeCanKillPlayer()
+PASS   : TestMapShrink::testBossNodeNeverInShrinkZone()
+PASS   : TestMapShrink::testCombatShrinkCountOnlyWhenPlayerInZone()
+PASS   : TestMapShrink::cleanupTestCase()
+Totals: 10 passed, 0 failed, 0 skipped, 0 blacklisted, 1ms
+********* Finished testing of TestMapShrink *********

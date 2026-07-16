@@ -1,0 +1,17 @@
+{
+  "id": "ironclad",
+  "name": "Ironclad",
+  "description": "A melee fighter who excels at trading life for strength.",
+  "base_stats": {
+    "max_hp": 80,
+    "current_hp": 80,
+    "gold": 99
+  },
+  "initial_deck": [
+    { "card_id": "strike", "count": 5 },
+    { "card_id": "defend", "count": 4 },
+    { "card_id": "bash", "count": 1 }
+  ],
+  "initial_relics": ["burning_blood"],
+  "initial_potions": []
+}

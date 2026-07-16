@@ -1,0 +1,12 @@
+********* Start testing of TestNodes *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)
+PASS   : TestNodes::initTestCase()
+PASS   : TestNodes::test_trash_heap_event_option()
+PASS   : TestNodes::test_health_potion_restores_hp()
+PASS   : TestNodes::test_fire_potion_deals_damage_in_combat()
+PASS   : TestNodes::test_campfire_heal_and_upgrade()
+PASS   : TestNodes::test_save_load_roundtrip()
+PASS   : TestNodes::test_character_factory_ironclad()
+PASS   : TestNodes::cleanupTestCase()
+Totals: 8 passed, 0 failed, 0 skipped, 0 blacklisted, 3ms
+********* Finished testing of TestNodes *********

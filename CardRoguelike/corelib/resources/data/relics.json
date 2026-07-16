@@ -1,0 +1,146 @@
+[
+  {
+    "id": "burning_blood",
+    "name": "Burning Blood",
+    "description": "At the end of combat, heal 6 HP.",
+    "trigger": "on_combat_end",
+    "effects": [
+      { "type": "restore_hp", "value": 6 }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "marble_bag",
+    "name": "Marble Bag",
+    "description": "At the start of each combat, apply 1 Vulnerable to all enemies.",
+    "trigger": "on_battle_start",
+    "effects": [
+      {
+        "type": "apply_power_to_all_enemies",
+        "power_id": "vulnerable",
+        "value": 1
+      }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "vajra",
+    "name": "Vajra",
+    "description": "At the start of each combat, gain 1 Strength.",
+    "trigger": "on_battle_start",
+    "effects": [
+      {
+        "type": "apply_power",
+        "power_id": "strength",
+        "value": 1,
+        "target": "self"
+      }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "toy_ornithopter",
+    "name": "Toy Ornithopter",
+    "description": "Whenever you use a potion, heal 5 HP.",
+    "trigger": "on_potion_use",
+    "effects": [
+      { "type": "restore_hp", "value": 5 }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "prepared_backpack",
+    "name": "Prepared Backpack",
+    "description": "At the start of each combat, draw 2 additional cards.",
+    "trigger": "on_battle_start",
+    "effects": [
+      { "type": "draw_cards", "value": 2 }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "insect_preserved_specimen",
+    "name": "Insect Preserved Specimen",
+    "description": "Elite enemies have 25% less HP.",
+    "trigger": "on_elite_combat_start",
+    "effects": [
+      { "type": "elite_hp_multiplier", "value": 0.75 }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "smooth_stone",
+    "name": "Smooth Stone",
+    "description": "At the start of each combat, gain 1 Dexterity.",
+    "trigger": "on_battle_start",
+    "effects": [
+      {
+        "type": "apply_power",
+        "power_id": "dexterity",
+        "value": 1,
+        "target": "self"
+      }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "pen_nib",
+    "name": "Pen Nib",
+    "description": "Every 10th Attack you play deals double damage.",
+    "trigger": "on_attack_played",
+    "effects": [
+      { "type": "double_damage_every_10th_attack" }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "paper_frog",
+    "name": "Paper Frog",
+    "description": "Enemies with Vulnerable take 75% more damage instead of 50%.",
+    "trigger": "passive",
+    "effects": [
+      { "type": "increase_vulnerable_multiplier", "value": 0.75 }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "old_coin",
+    "name": "Old Coin",
+    "description": "Upon obtaining this relic, gain 300 gold.",
+    "trigger": "on_pickup",
+    "effects": [
+      { "type": "gain_gold", "value": 300 }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "hiking_boots",
+    "name": "Hiking Boots",
+    "description": "Moving through explored nodes costs no steps.",
+    "trigger": "passive",
+    "effects": [
+      { "type": "explored_nodes_no_step_cost" }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "fate",
+    "name": "Fate",
+    "description": "Shrink damage cannot reduce your HP below 1 (all other damage sources can still kill).",
+    "trigger": "passive",
+    "effects": [
+      { "type": "shrink_damage_cannot_kill" }
+    ],
+    "max_stack": 1
+  },
+  {
+    "id": "lizard_tail",
+    "name": "Lizard Tail",
+    "description": "When you would be killed, survive with 50% of your max HP instead (works once).",
+    "trigger": "on_fatal_damage",
+    "effects": [
+      { "type": "revive_to_percent_hp", "value": 50 }
+    ],
+    "max_stack": 1
+  }
+]

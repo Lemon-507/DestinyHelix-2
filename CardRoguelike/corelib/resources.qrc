@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/data/events.json</file>
+        <file>resources/data/potions.json</file>
+        <file>resources/data/cards.json</file>
+        <file>resources/data/relics.json</file>
+        <file>resources/data/enemies.json</file>
+        <file>resources/data/enemypool.json</file>
+        <file>resources/data/buffs.json</file>
+        <file>resources/data/characters/ironclad.json</file>
+    </qresource>
+</RCC>

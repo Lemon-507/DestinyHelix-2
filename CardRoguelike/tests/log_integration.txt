@@ -1,0 +1,15 @@
+********* Start testing of TestFullRun *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)
+PASS   : TestFullRun::initTestCase()
+PASS   : TestFullRun::test_shrink_death_on_map_movement()
+PASS   : TestFullRun::test_shrink_death_in_combat()
+PASS   : TestFullRun::test_save_load_mid_run()
+QWARN  : TestFullRun::test_event_old_chest_and_merchant() EventManager: unsupported effect "gain_random_potion"
+FAIL!  : TestFullRun::test_event_old_chest_and_merchant() 'potionTotal >= 1' returned FALSE. ()
+integration\test_full_run.cpp(144) : failure location
+PASS   : TestFullRun::test_boss_combat_victory()
+PASS   : TestFullRun::test_explosive_and_block_potions()
+PASS   : TestFullRun::test_invalid_save_rejected()
+PASS   : TestFullRun::cleanupTestCase()
+Totals: 8 passed, 1 failed, 0 skipped, 0 blacklisted, 11ms
+********* Finished testing of TestFullRun *********

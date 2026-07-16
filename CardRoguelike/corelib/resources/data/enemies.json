@@ -1,0 +1,927 @@
+[
+  {
+    "id": "cultist",
+    "name": "Cultist",
+    "type": "normal",
+    "min_hp": 48,
+    "max_hp": 54,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "buff",
+        "buff_type": "ritual",
+        "value": 3,
+        "description": "Incantation: Gain 3 Ritual."
+      },
+      {
+        "type": "attack",
+        "base_value": 6,
+        "description": "Dark Strike: Deal 6 damage."
+      }
+    ],
+    "behavior": {
+      "initial_intent": 0,
+      "loop": [1],
+      "description": "Always uses Incantation on the first turn, then repeats Dark Strike every turn."
+    }
+  },
+  {
+    "id": "jaw_worm",
+    "name": "Jaw Worm",
+    "type": "normal",
+    "min_hp": 40,
+    "max_hp": 44,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 11,
+        "description": "Chomp: Deal 11 damage."
+      },
+      {
+        "type": "buff_and_block",
+        "buff_type": "strength",
+        "value": 3,
+        "block_value": 6,
+        "description": "Bellow: Gain 3 Strength and 6 Block."
+      },
+      {
+        "type": "attack_and_block",
+        "base_value": 7,
+        "block_value": 5,
+        "description": "Shield Bash: Deal 7 damage and gain 5 Block."
+      }
+    ],
+    "behavior": {
+      "initial_intent": 0,
+      "probability_rule": {
+        "after_initial": {
+          "0": 0.25,
+          "1": 0.45,
+          "2": 0.30
+        }
+      },
+      "restrictions": [
+        "cannot_use_intent_0_two_consecutive",
+        "cannot_use_intent_1_two_consecutive",
+        "cannot_use_intent_2_three_consecutive"
+      ],
+      "description": "Always uses Chomp on the first turn. Afterwards, chooses with probabilities: Bellow 45%, Shield Bash 30%, Chomp 25%. Cannot use Bellow or Chomp twice in a row. Cannot use Shield Bash three times in a row."
+    }
+  },
+  {
+    "id": "spike_slime_large",
+    "name": "Spike Slime (Large)",
+    "type": "normal",
+    "min_hp": 64,
+    "max_hp": 70,
+    "abilities": [
+      {
+        "type": "split_spike",
+        "trigger": "hp_below_50_percent",
+        "action": "force_next_intent_split",
+        "description": "When HP ≤ 50%, forces next turn's intent to Split (Spike)."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack_and_add_cards",
+        "base_value": 16,
+        "card": "slimed",
+        "count": 2,
+        "chance": 0.30,
+        "description": "Corrosive Spit: Deal 16 damage, add 2 Slimed to discard pile."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "frail",
+        "value": 2,
+        "chance": 0.70,
+        "description": "Lick: Apply 2 Frail."
+      },
+      {
+        "type": "split",
+        "into": ["spike_slime_medium", "spike_slime_medium"],
+        "description": "Split into two Spike Slimes (Medium), each with current HP."
+      }
+    ],
+    "behavior": {
+      "normal_cycle": {
+        "choose_from": [0, 1],
+        "probability": { "0": 0.30, "1": 0.70 },
+        "restrictions": "cannot_same_intent_three_consecutive"
+      },
+      "split_override": "when_hp_half_force_intent_2_next_turn",
+      "description": "Randomly uses Corrosive Spit or Lick, cannot repeat the same intent three times in a row. When HP ≤ 50%, forces Split on next turn."
+    }
+  },
+  {
+    "id": "spike_slime_medium",
+    "name": "Spike Slime (Medium)",
+    "type": "normal",
+    "min_hp": 28,
+    "max_hp": 32,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack_and_add_cards",
+        "base_value": 8,
+        "card": "slimed",
+        "count": 1,
+        "chance": 0.30,
+        "description": "Corrosive Spit: Deal 8 damage, add 1 Slimed to discard pile."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "frail",
+        "value": 1,
+        "chance": 0.70,
+        "description": "Lick: Apply 1 Frail."
+      }
+    ],
+    "behavior": {
+      "choose_from": [0, 1],
+      "probability": { "0": 0.30, "1": 0.70 },
+      "restrictions": "cannot_same_intent_three_consecutive",
+      "description": "Randomly uses Corrosive Spit or Lick, cannot repeat the same intent three times in a row."
+    }
+  },
+  {
+    "id": "spike_slime_small",
+    "name": "Spike Slime (Small)",
+    "type": "normal",
+    "min_hp": 10,
+    "max_hp": 14,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 5,
+        "description": "Tackle: Deal 5 damage."
+      }
+    ],
+    "behavior": {
+      "loop": [0],
+      "description": "Uses Tackle every turn."
+    }
+  },
+  {
+    "id": "acid_slime_large",
+    "name": "Acid Slime (Large)",
+    "type": "normal",
+    "min_hp": 65,
+    "max_hp": 69,
+    "abilities": [
+      {
+        "type": "split_acid",
+        "trigger": "hp_below_50_percent",
+        "action": "force_next_intent_split",
+        "description": "When HP ≤ 50%, forces next turn's intent to Split (Acid)."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack_and_add_cards",
+        "base_value": 11,
+        "card": "slimed",
+        "count": 2,
+        "chance": 0.30,
+        "description": "Corrosive Spit: Deal 11 damage, add 2 Slimed to discard pile."
+      },
+      {
+        "type": "attack",
+        "base_value": 16,
+        "chance": 0.40,
+        "description": "Heavy Strike: Deal 16 damage."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "weak",
+        "value": 2,
+        "chance": 0.30,
+        "description": "Lick: Apply 2 Weak."
+      },
+      {
+        "type": "split",
+        "into": ["acid_slime_medium", "acid_slime_medium"],
+        "description": "Split into two Acid Slimes (Medium), each with current HP."
+      }
+    ],
+    "behavior": {
+      "normal_cycle": {
+        "choose_from": [0, 1, 2],
+        "probability": { "0": 0.30, "1": 0.40, "2": 0.30 },
+        "restrictions": [
+          "cannot_use_intent_1_two_consecutive",
+          "cannot_same_intent_three_consecutive_for_0_and_2"
+        ]
+      },
+      "split_override": "when_hp_half_force_intent_3_next_turn",
+      "description": "Randomly uses Corrosive Spit, Heavy Strike, or Lick. Cannot use Heavy Strike twice in a row; other intents cannot be used three times consecutively. When HP ≤ 50%, forces Split on next turn."
+    }
+  },
+  {
+    "id": "acid_slime_medium",
+    "name": "Acid Slime (Medium)",
+    "type": "normal",
+    "min_hp": 28,
+    "max_hp": 32,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack_and_add_cards",
+        "base_value": 7,
+        "card": "slimed",
+        "count": 1,
+        "chance": 0.30,
+        "description": "Corrosive Spit: Deal 7 damage, add 1 Slimed to discard pile."
+      },
+      {
+        "type": "attack",
+        "base_value": 10,
+        "chance": 0.40,
+        "description": "Heavy Strike: Deal 10 damage."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "weak",
+        "value": 1,
+        "chance": 0.30,
+        "description": "Lick: Apply 1 Weak."
+      }
+    ],
+    "behavior": {
+      "choose_from": [0, 1, 2],
+      "probability": { "0": 0.30, "1": 0.40, "2": 0.30 },
+      "restrictions": [
+        "cannot_use_intent_1_two_consecutive",
+        "cannot_same_intent_three_consecutive_for_0_and_2"
+      ],
+      "description": "Randomly uses Corrosive Spit, Heavy Strike, or Lick. Cannot use Heavy Strike twice in a row; other intents cannot be used three times consecutively."
+    }
+  },
+  {
+    "id": "acid_slime_small",
+    "name": "Acid Slime (Small)",
+    "type": "normal",
+    "min_hp": 8,
+    "max_hp": 12,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 3,
+        "description": "Tackle: Deal 3 damage."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "weak",
+        "value": 1,
+        "description": "Lick: Apply 1 Weak."
+      }
+    ],
+    "behavior": {
+      "alternating": [0, 1],
+      "first_turn_random": true,
+      "description": "On the first turn, 50% Tackle / 50% Lick. Then alternates between Tackle and Lick."
+    }
+  },
+  {
+    "id": "fat_gremlin",
+    "name": "Fat Gremlin",
+    "type": "normal",
+    "min_hp": 13,
+    "max_hp": 17,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack_and_debuff",
+        "base_value": 4,
+        "debuff_type": "weak",
+        "value": 1,
+        "description": "Smash: Deal 4 damage and apply 1 Weak."
+      }
+    ],
+    "behavior": {
+      "loop": [0],
+      "description": "Uses Smash every turn."
+    }
+  },
+  {
+    "id": "mad_gremlin",
+    "name": "Mad Gremlin",
+    "type": "normal",
+    "min_hp": 20,
+    "max_hp": 24,
+    "abilities": [
+      {
+        "type": "angry",
+        "value": 1,
+        "description": "Angry 1: Upon taking attack damage, gain 1 Strength."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 4,
+        "description": "Scratch: Deal 4 damage."
+      }
+    ],
+    "behavior": {
+      "loop": [0],
+      "description": "Uses Scratch every turn."
+    }
+  },
+  {
+    "id": "shield_gremlin",
+    "name": "Shield Gremlin",
+    "type": "normal",
+    "min_hp": 12,
+    "max_hp": 15,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "buff_ally",
+        "block_value": 7,
+        "description": "Protect: Grant 7 Block to a random other enemy."
+      },
+      {
+        "type": "attack",
+        "base_value": 6,
+        "description": "Shield Bash: Deal 6 damage."
+      }
+    ],
+    "behavior": {
+      "conditional_loop": {
+        "condition": "if_other_enemies_alive",
+        "then": 0,
+        "else": 1
+      },
+      "description": "If there are other enemies alive, use Protect (random target, not self). Otherwise, use Shield Bash."
+    }
+  },
+  {
+    "id": "sneaky_gremlin",
+    "name": "Sneaky Gremlin",
+    "type": "normal",
+    "min_hp": 10,
+    "max_hp": 14,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 9,
+        "description": "Stab: Deal 9 damage."
+      }
+    ],
+    "behavior": {
+      "loop": [0],
+      "description": "Uses Stab every turn."
+    }
+  },
+  {
+    "id": "gremlin_wizard",
+    "name": "Gremlin Wizard",
+    "type": "normal",
+    "min_hp": 21,
+    "max_hp": 25,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "none",
+        "description": "Charge: Does nothing."
+      },
+      {
+        "type": "attack",
+        "base_value": 25,
+        "description": "Ultimate Blast: Deal 25 damage."
+      }
+    ],
+    "behavior": {
+      "sequence": [0, 0, 1],
+      "loop": true,
+      "post_loop_rest": 3,
+      "description": "Charges for 2 turns, then uses Ultimate Blast. Afterwards, requires 3 turns of charging before using Ultimate Blast again."
+    }
+  },
+  {
+    "id": "red_louse",
+    "name": "Red Louse",
+    "type": "normal",
+    "min_hp": 10,
+    "max_hp": 15,
+    "abilities": [
+      {
+        "type": "curl_up",
+        "value": "random_5_to_7",
+        "description": "Curl Up: The first time it takes attack damage, gain 5-7 Block (determined at combat start). Once per combat."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": "random_5_to_7",
+        "description": "Bite: Deal 5-7 damage (value decided at start of combat)."
+      },
+      {
+        "type": "buff",
+        "buff_type": "strength",
+        "value": 3,
+        "description": "Grow: Gain 3 Strength."
+      }
+    ],
+    "behavior": {
+      "choose_from": [0, 1],
+      "probability": { "0": 0.75, "1": 0.25 },
+      "restrictions": "cannot_same_intent_three_consecutive",
+      "description": "Randomly uses Bite or Grow; cannot use the same intent three times in a row."
+    }
+  },
+  {
+    "id": "green_louse",
+    "name": "Green Louse",
+    "type": "normal",
+    "min_hp": 11,
+    "max_hp": 17,
+    "abilities": [
+      {
+        "type": "curl_up",
+        "value": "random_5_to_7",
+        "description": "Curl Up: The first time it takes attack damage, gain 5-7 Block (determined at combat start). Once per combat."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": "random_5_to_7",
+        "description": "Bite: Deal 5-7 damage (value decided at start of combat)."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "weak",
+        "value": 2,
+        "description": "Web: Apply 2 Weak."
+      }
+    ],
+    "behavior": {
+      "choose_from": [0, 1],
+      "probability": { "0": 0.75, "1": 0.25 },
+      "restrictions": "cannot_same_intent_three_consecutive",
+      "description": "Randomly uses Bite or Web; cannot use the same intent three times in a row."
+    }
+  },
+  {
+    "id": "red_slaver",
+    "name": "Red Slaver",
+    "type": "normal",
+    "min_hp": 46,
+    "max_hp": 50,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 13,
+        "description": "Stab: Deal 13 damage."
+      },
+      {
+        "type": "attack_and_debuff",
+        "base_value": 8,
+        "debuff_type": "vulnerable",
+        "value": 1,
+        "description": "Scrape: Deal 8 damage and apply 1 Vulnerable."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "entangled",
+        "value": 1,
+        "description": "Net: Apply 1 Entangled (cannot play Attack cards this turn)."
+      }
+    ],
+    "behavior": {
+      "first_turn": 0,
+      "after": {
+        "pattern": {
+          "type": "weighted_random_with_memory",
+          "intent_pool": [1, 2],
+          "weight": { "1": 0.75, "2": 0.25 },
+          "on_use_2": "next_turn_force_0",
+          "default_sequence": [1, 1, 0],
+          "description": "Has a 25% chance to use Net. When Net is used, next turn is forced to Stab. Otherwise, follows the sequence Scrape → Scrape → Stab."
+        }
+      }
+    }
+  },
+  {
+    "id": "blue_slaver",
+    "name": "Blue Slaver",
+    "type": "normal",
+    "min_hp": 46,
+    "max_hp": 50,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 12,
+        "chance": 0.60,
+        "description": "Stab: Deal 12 damage."
+      },
+      {
+        "type": "attack_and_debuff",
+        "base_value": 7,
+        "debuff_type": "weak",
+        "value": 1,
+        "chance": 0.40,
+        "description": "Rake: Deal 7 damage and apply 1 Weak."
+      }
+    ],
+    "behavior": {
+      "choose_from": [0, 1],
+      "probability": { "0": 0.60, "1": 0.40 },
+      "description": "Each turn randomly chooses between Stab (60%) and Rake (40%)."
+    }
+  },
+  {
+    "id": "fungi_beast",
+    "name": "Fungi Beast",
+    "type": "normal",
+    "min_hp": 22,
+    "max_hp": 28,
+    "abilities": [
+      {
+        "type": "spore_cloud",
+        "value": 2,
+        "description": "Spore Cloud 2: On death, apply 2 turns of Vulnerable to the player."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 6,
+        "description": "Bite: Deal 6 damage."
+      },
+      {
+        "type": "buff",
+        "buff_type": "strength",
+        "value": 3,
+        "description": "Grow: Gain 3 Strength."
+      }
+    ],
+    "behavior": {
+      "first_turn_probability": { "0": 0.60, "1": 0.40 },
+      "rules": [
+        "after_growth_always_attack",
+        "after_two_consecutive_attacks_always_growth",
+        "otherwise_default_probability",
+        "cannot_attack_three_consecutive",
+        "cannot_growth_two_consecutive"
+      ],
+      "description": "First turn: 60% Bite, 40% Grow. After Grow, always uses Bite next turn. After two consecutive Bites, always uses Grow. Otherwise follows first-turn probabilities. Cannot use Bite three times in a row; cannot use Grow twice in a row."
+    }
+  },
+  {
+    "id": "looter",
+    "name": "Looter",
+    "type": "normal",
+    "min_hp": 44,
+    "max_hp": 48,
+    "abilities": [
+      {
+        "type": "steal",
+        "value": 15,
+        "description": "Steal 15: On attack, steals 15 gold."
+      },
+      {
+        "type": "gold",
+        "value": 0,
+        "description": "Gold: On death, drops all stolen gold."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 10,
+        "description": "Mug: Deal 10 damage and steal gold."
+      },
+      {
+        "type": "attack",
+        "base_value": 12,
+        "description": "Lunge: Deal 12 damage and steal gold."
+      },
+      {
+        "type": "block",
+        "block_value": 6,
+        "description": "Smoke Bomb: Gain 6 Block."
+      },
+      {
+        "type": "escape",
+        "description": "Escape: Flee from combat, taking all stolen gold."
+      }
+    ],
+    "behavior": {
+      "sequence": [
+        [0, 0],
+        {
+          "type": "random",
+          "options": [
+            { "intent": 1, "weight": 0.5 },
+            { "intent": 2, "weight": 0.5 }
+          ],
+          "if_1": "then_next_2",
+          "if_2": "then_next_3"
+        }
+      ],
+      "description": "First two turns use Mug. On the third turn, 50% Lunge / 50% Smoke Bomb. After Lunge, next turn is always Smoke Bomb. After Smoke Bomb, next turn is Escape."
+    }
+  },
+  {
+    "id": "gremlin_nob",
+    "name": "Gremlin Nob",
+    "type": "elite",
+    "min_hp": 82,
+    "max_hp": 86,
+    "abilities": [
+      {
+        "type": "rage",
+        "value": 2,
+        "description": "Rage 2: Whenever the player plays a Skill card, gain 2 Strength."
+      }
+    ],
+    "intents": [
+      {
+        "type": "buff",
+        "buff_type": "rage",
+        "value": 2,
+        "description": "Bellow: Gain 2 Rage."
+      },
+      {
+        "type": "attack_and_debuff",
+        "base_value": 6,
+        "debuff_type": "vulnerable",
+        "value": 2,
+        "chance": 0.33,
+        "description": "Skull Bash: Deal 6 damage and apply 2 Vulnerable."
+      },
+      {
+        "type": "attack",
+        "base_value": 14,
+        "chance": 0.67,
+        "description": "Bull Rush: Deal 14 damage."
+      }
+    ],
+    "behavior": {
+      "initial_intent": 0,
+      "after": {
+        "choose_from": [1, 2],
+        "probability": { "1": 0.33, "2": 0.67 },
+        "description": "Always uses Bellow on the first turn. Then randomly uses Skull Bash (33%) or Bull Rush (67%) each turn."
+      }
+    }
+  },
+  {
+    "id": "lagavulin",
+    "name": "Lagavulin",
+    "type": "elite",
+    "min_hp": 109,
+    "max_hp": 111,
+    "abilities": [
+      {
+        "type": "metallicize",
+        "value": 8,
+        "description": "Metallicize 8: At the end of its turn, gain 8 Block."
+      },
+      {
+        "type": "sleep",
+        "description": "Starts asleep. Wakes upon taking damage or on turn 4. If woken by damage, is stunned this turn. On waking, removes Metallicize."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 18,
+        "description": "Heavy Strike: Deal 18 damage."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "strength_down",
+        "value": 1,
+        "additional": "dexterity_down_1",
+        "description": "Siphon Soul: Player loses 1 Strength and 1 Dexterity."
+      }
+    ],
+    "behavior": {
+      "sleep_state": {
+        "start_asleep": true,
+        "wake_condition": "damage_or_turn_4",
+        "on_damage_wake": "stunned_this_turn",
+        "on_natural_wake": "use_intent_0_immediately"
+      },
+      "awake_sequence": [1, 0, 0],
+      "loop": true,
+      "description": "While asleep, Metallicize is active. Upon waking, follows Siphon Soul → Heavy Strike → Heavy Strike, repeating."
+    }
+  },
+  {
+    "id": "sentry",
+    "name": "Sentry",
+    "type": "elite",
+    "min_hp": 38,
+    "max_hp": 42,
+    "abilities": [
+      {
+        "type": "artifact",
+        "value": 1,
+        "description": "Artifact 1: Negates the next debuff."
+      }
+    ],
+    "intents": [
+      {
+        "type": "attack",
+        "base_value": 9,
+        "description": "Laser: Deal 9 damage."
+      },
+      {
+        "type": "add_cards_to_discard",
+        "card": "dazed",
+        "count": 2,
+        "description": "Daze: Shuffle 2 Dazed cards into discard pile."
+      }
+    ],
+    "behavior": {
+      "count": 3,
+      "initial_intents": {
+        "0": 0,
+        "1": 1,
+        "2": 1
+      },
+      "alternating": [0, 1],
+      "description": "Three Sentries appear. One starts with Laser, two start with Daze. Each then alternates between Laser and Daze."
+    }
+  },
+  {
+    "id": "hexaghost",
+    "name": "Hexaghost",
+    "type": "boss",
+    "min_hp": 250,
+    "max_hp": 250,
+    "abilities": [],
+    "intents": [
+      {
+        "type": "none",
+        "description": "Prepare: Ignite the six ghost flames."
+      },
+      {
+        "type": "attack_and_add_cards",
+        "base_value": 6,
+        "card": "burn",
+        "count": 1,
+        "description": "Sear: Deal 6 damage and add 1 Burn to discard pile."
+      },
+      {
+        "type": "attack_multiple",
+        "base_value": 5,
+        "times": 2,
+        "description": "Double Strike: Deal 5 damage twice."
+      },
+      {
+        "type": "buff_and_block",
+        "buff_type": "strength",
+        "value": 2,
+        "block_value": 12,
+        "description": "Inferno: Gain 2 Strength and 12 Block."
+      },
+      {
+        "type": "attack_multiple_and_add_cards",
+        "base_value": 2,
+        "times": 6,
+        "card": "burn_plus",
+        "count": 3,
+        "description": "Hellfire: Deal 2 damage 6 times, add 3 Burn+ to discard pile."
+      },
+      {
+        "type": "attack_multiple_scaling",
+        "base_calc": "player_hp_div_12_plus_1",
+        "times": 6,
+        "description": "Hellfire+: Deal X damage 6 times. X = (player's current HP / 12) + 1."
+      }
+    ],
+    "behavior": {
+      "turn_sequence": {
+        "1": 0,
+        "2": 5,
+        "3_to_9": {
+          "cycle": [1, 2, 1, 3, 2, 1, 4],
+          "description": "Starting from turn 3, follows a 7-turn cycle: Sear → Double Strike → Sear → Inferno → Double Strike → Sear → Hellfire."
+        }
+      },
+      "inferno_upgrades_burns": true,
+      "description": "Turn 1: Prepare. Turn 2: Hellfire+. Then begins the 7-turn cycle on turn 3."
+    }
+  },
+  {
+    "id": "the_guardian",
+    "name": "The Guardian",
+    "type": "boss",
+    "min_hp": 240,
+    "max_hp": 240,
+    "abilities": [
+      {
+        "type": "mode_shift",
+        "value": 30,
+        "description": "Mode Shift 30 (Attack Mode only): After taking 30 damage while in Attack Mode, immediately enters Defensive Mode. Each subsequent shift increases the threshold by 10. This ability is inactive while in Defensive Mode."
+      }
+    ],
+    "intents": [
+      {
+        "type": "block",
+        "block_value": 9,
+        "description": "Charge Up: Gain 9 Block. Used on the first turn and after Whirlwind."
+      },
+      {
+        "type": "attack",
+        "base_value": 32,
+        "description": "Fierce Bash: Deal 32 damage. Used after Charge Up."
+      },
+      {
+        "type": "debuff",
+        "debuff_type": "weak_and_vulnerable",
+        "value": 2,
+        "description": "Steam Spout: Apply 2 Weak and 2 Vulnerable. Used after Fierce Bash."
+      },
+      {
+        "type": "attack_multiple",
+        "base_value": 5,
+        "times": 4,
+        "description": "Whirlwind: Deal 5 damage 4 times. Used after Steam Spout, or first turn after switching back to Attack Mode."
+      },
+      {
+        "type": "buff",
+        "buff_type": "sharp_hide",
+        "value": 3,
+        "description": "Strengthen: Gain 3 Sharp Hide. Used on the first turn after entering Defensive Mode."
+      },
+      {
+        "type": "attack",
+        "base_value": 9,
+        "description": "Tackle: Deal 9 damage. Used on the second turn of Defensive Mode."
+      },
+      {
+        "type": "attack_multiple",
+        "base_value": 8,
+        "times": 2,
+        "description": "Double Slash: Deal 8 damage twice. After this, removes Sharp Hide, switches back to Attack Mode, and permanently increases Mode Shift threshold by 10."
+      }
+    ],
+    "behavior": {
+      "attack_mode_sequence": [0, 1, 2, 3],
+      "defense_mode_sequence": [4, 5, 6],
+      "mode_switch_damage_threshold": 30,
+      "threshold_increase_per_switch": 10,
+      "first_attack_mode_turn": 0,
+      "first_defense_mode_turn": 4,
+      "description": "Starts in Attack Mode. In Attack Mode, cycles: Charge Up → Fierce Bash → Steam Spout → Whirlwind → repeat. When the damage threshold is reached while in Attack Mode, immediately switches to Defensive Mode. In Defensive Mode: Strengthen (gain Sharp Hide 3) → Tackle → Double Slash. After Double Slash, removes Sharp Hide, switches back to Attack Mode, and permanently increases Mode Shift threshold by 10. Mode Shift only triggers in Attack Mode."
+    }
+  },
+  {
+    "id": "slime_boss",
+    "name": "Slime Boss",
+    "type": "boss",
+    "min_hp": 140,
+    "max_hp": 140,
+    "abilities": [
+      {
+        "type": "split_plus",
+        "trigger": "hp_below_50_percent",
+        "action": "force_next_intent_split",
+        "description": "When HP ≤ 50%, forces next turn's intent to Split+."
+      }
+    ],
+    "intents": [
+      {
+        "type": "add_cards_to_discard",
+        "card": "slimed",
+        "count": 3,
+        "description": "Goop Spray: Add 3 Slimed to discard pile."
+      },
+      {
+        "type": "none",
+        "description": "Prepare: Does nothing."
+      },
+      {
+        "type": "attack",
+        "base_value": 35,
+        "description": "Slam: Deal 35 damage."
+      },
+      {
+        "type": "split",
+        "into": ["acid_slime_large", "spike_slime_large"],
+        "description": "Split+ into one Acid Slime (Large) and one Spike Slime (Large) with current HP."
+      }
+    ],
+    "behavior": {
+      "sequence": [0, 1, 2],
+      "loop": true,
+      "split_override": "when_hp_half_force_intent_3_next_turn",
+      "description": "Cycles: Goop Spray → Prepare → Slam. When HP ≤ 50%, forces Split+ on next turn."
+    }
+  }
+]

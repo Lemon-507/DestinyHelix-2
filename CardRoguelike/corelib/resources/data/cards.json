@@ -1,0 +1,482 @@
+[
+  {
+    "id": "strike",
+    "name": "Strike",
+    "rarity": "Basic",
+    "cost": 1,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage", "value": 6 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "deal_damage", "value": 9 }
+      ]
+    }
+  },
+  {
+    "id": "defend",
+    "name": "Defend",
+    "rarity": "Basic",
+    "cost": 1,
+    "type": "Skill",
+    "target": "Self",
+    "effects": [
+      { "type": "gain_block", "value": 5 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "gain_block", "value": 8 }
+      ]
+    }
+  },
+  {
+    "id": "bash",
+    "name": "Bash",
+    "rarity": "Basic",
+    "cost": 2,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage", "value": 8 },
+      { "type": "apply_power", "power": "vulnerable", "value": 2 }
+    ],
+    "upgraded": {
+      "cost": 2,
+      "effects": [
+        { "type": "deal_damage", "value": 10 },
+        { "type": "apply_power", "power": "vulnerable", "value": 3 }
+      ]
+    }
+  },
+  {
+    "id": "iron_wave",
+    "name": "Iron Wave",
+    "rarity": "Common",
+    "cost": 1,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "gain_block", "value": 5 },
+      { "type": "deal_damage", "value": 5 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "gain_block", "value": 7 },
+        { "type": "deal_damage", "value": 7 }
+      ]
+    }
+  },
+  {
+    "id": "twin_strike",
+    "name": "Twin Strike",
+    "rarity": "Common",
+    "cost": 1,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage", "value": 5 },
+      { "type": "deal_damage", "value": 5 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "deal_damage", "value": 7 },
+        { "type": "deal_damage", "value": 7 }
+      ]
+    }
+  },
+  {
+    "id": "hemokinesis",
+    "name": "Hemokinesis",
+    "rarity": "Uncommon",
+    "cost": 1,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "lose_hp", "value": 2 },
+      { "type": "deal_damage", "value": 15 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "lose_hp", "value": 2 },
+        { "type": "deal_damage", "value": 20 }
+      ]
+    }
+  },
+  {
+    "id": "bludgeon",
+    "name": "Bludgeon",
+    "rarity": "Rare",
+    "cost": 3,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage", "value": 32 }
+    ],
+    "upgraded": {
+      "cost": 3,
+      "effects": [
+        { "type": "deal_damage", "value": 42 }
+      ]
+    }
+  },
+  {
+    "id": "uppercut",
+    "name": "Uppercut",
+    "rarity": "Uncommon",
+    "cost": 2,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage", "value": 13 },
+      { "type": "apply_power", "power": "weak", "value": 1 },
+      { "type": "apply_power", "power": "vulnerable", "value": 1 }
+    ],
+    "upgraded": {
+      "cost": 2,
+      "effects": [
+        { "type": "deal_damage", "value": 13 },
+        { "type": "apply_power", "power": "weak", "value": 2 },
+        { "type": "apply_power", "power": "vulnerable", "value": 2 }
+      ]
+    }
+  },
+  {
+    "id": "rampage",
+    "name": "Rampage",
+    "rarity": "Uncommon",
+    "cost": 1,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage", "value": 8 },
+      { "type": "increase_damage_per_play", "value": 5 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "deal_damage", "value": 8 },
+        { "type": "increase_damage_per_play", "value": 8 }
+      ]
+    }
+  },
+  {
+    "id": "pommel_strike",
+    "name": "Pommel Strike",
+    "rarity": "Common",
+    "cost": 1,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage", "value": 9 },
+      { "type": "draw_card", "value": 1 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "deal_damage", "value": 10 },
+        { "type": "draw_card", "value": 2 }
+      ]
+    }
+  },
+  {
+    "id": "thunderclap",
+    "name": "Thunderclap",
+    "rarity": "Common",
+    "cost": 1,
+    "type": "Attack",
+    "target": "AllEnemies",
+    "effects": [
+      { "type": "deal_damage", "value": 4 },
+      { "type": "apply_power", "power": "vulnerable", "value": 1 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "deal_damage", "value": 7 },
+        { "type": "apply_power", "power": "vulnerable", "value": 1 }
+      ]
+    }
+  },
+  {
+    "id": "body_slam",
+    "name": "Body Slam",
+    "rarity": "Common",
+    "cost": 1,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage_per_block" }
+    ],
+    "upgraded": {
+      "cost": 0,
+      "effects": [
+        { "type": "deal_damage_per_block" }
+      ]
+    }
+  },
+  {
+    "id": "cleave",
+    "name": "Cleave",
+    "rarity": "Common",
+    "cost": 1,
+    "type": "Attack",
+    "target": "AllEnemies",
+    "effects": [
+      { "type": "deal_damage", "value": 8 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "deal_damage", "value": 11 }
+      ]
+    }
+  },
+  {
+    "id": "clothesline",
+    "name": "Clothesline",
+    "rarity": "Common",
+    "cost": 2,
+    "type": "Attack",
+    "target": "SingleEnemy",
+    "effects": [
+      { "type": "deal_damage", "value": 12 },
+      { "type": "apply_power", "power": "weak", "value": 2 }
+    ],
+    "upgraded": {
+      "cost": 2,
+      "effects": [
+        { "type": "deal_damage", "value": 14 },
+        { "type": "apply_power", "power": "weak", "value": 3 }
+      ]
+    }
+  },
+  {
+    "id": "inflame",
+    "name": "Inflame",
+    "rarity": "Uncommon",
+    "cost": 1,
+    "type": "Power",
+    "target": "Self",
+    "effects": [
+      { "type": "apply_power", "power": "strength", "value": 2 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "apply_power", "power": "strength", "value": 3 }
+      ]
+    }
+  },
+  {
+    "id": "metallicize",
+    "name": "Metallicize",
+    "rarity": "Uncommon",
+    "cost": 1,
+    "type": "Power",
+    "target": "Self",
+    "effects": [
+      { "type": "apply_power", "power": "metallicize", "value": 3 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "apply_power", "power": "metallicize", "value": 4 }
+      ]
+    }
+  },
+  {
+    "id": "demon_form",
+    "name": "Demon Form",
+    "rarity": "Rare",
+    "cost": 3,
+    "type": "Power",
+    "target": "Self",
+    "effects": [
+      { "type": "apply_power", "power": "demon_form", "value": 2 }
+    ],
+    "upgraded": {
+      "cost": 3,
+      "effects": [
+        { "type": "apply_power", "power": "demon_form", "value": 3 }
+      ]
+    }
+  },
+  {
+    "id": "bloodletting",
+    "name": "Bloodletting",
+    "rarity": "Uncommon",
+    "cost": 0,
+    "type": "Skill",
+    "target": "Self",
+    "effects": [
+      { "type": "lose_hp", "value": 3 },
+      { "type": "gain_energy", "value": 2 }
+    ],
+    "upgraded": {
+      "cost": 0,
+      "effects": [
+        { "type": "lose_hp", "value": 3 },
+        { "type": "gain_energy", "value": 3 }
+      ]
+    }
+  },
+  {
+    "id": "seeing_red",
+    "name": "Seeing Red",
+    "rarity": "Uncommon",
+    "cost": 1,
+    "type": "Skill",
+    "target": "Self",
+    "effects": [
+      { "type": "gain_energy", "value": 2 },
+      { "type": "exhaust" }
+    ],
+    "upgraded": {
+      "cost": 0,
+      "effects": [
+        { "type": "gain_energy", "value": 3 },
+        { "type": "exhaust" }
+      ]
+    }
+  },
+  {
+    "id": "power_through",
+    "name": "Power Through",
+    "rarity": "Uncommon",
+    "cost": 1,
+    "type": "Skill",
+    "target": "Self",
+    "effects": [
+      { "type": "add_card_to_hand", "card_id": "wound", "value": 2 },
+      { "type": "gain_block", "value": 15 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "add_card_to_hand", "card_id": "wound", "value": 2 },
+        { "type": "gain_block", "value": 20 }
+      ]
+    }
+  },
+  {
+    "id": "second_wind",
+    "name": "Second Wind",
+    "rarity": "Uncommon",
+    "cost": 1,
+    "type": "Skill",
+    "target": "Self",
+    "effects": [
+      { "type": "exhaust_non_attack_gain_block", "value": 5 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "exhaust_non_attack_gain_block", "value": 7 }
+      ]
+    }
+  },
+  {
+    "id": "shockwave",
+    "name": "Shockwave",
+    "rarity": "Uncommon",
+    "cost": 2,
+    "type": "Skill",
+    "target": "AllEnemies",
+    "effects": [
+      { "type": "apply_power", "power": "weak", "value": 3 },
+      { "type": "apply_power", "power": "vulnerable", "value": 3 },
+      { "type": "exhaust" }
+    ],
+    "upgraded": {
+      "cost": 2,
+      "effects": [
+        { "type": "apply_power", "power": "weak", "value": 5 },
+        { "type": "apply_power", "power": "vulnerable", "value": 5 },
+        { "type": "exhaust" }
+      ]
+    }
+  },
+  {
+    "id": "shrug_it_off",
+    "name": "Shrug It Off",
+    "rarity": "Common",
+    "cost": 1,
+    "type": "Skill",
+    "target": "Self",
+    "effects": [
+      { "type": "gain_block", "value": 8 },
+      { "type": "draw_card", "value": 1 }
+    ],
+    "upgraded": {
+      "cost": 1,
+      "effects": [
+        { "type": "gain_block", "value": 11 },
+        { "type": "draw_card", "value": 1 }
+      ]
+    }
+  },
+  {
+    "id": "slimed",
+    "name": "Slimed",
+    "rarity": "Special",
+    "cost": 1,
+    "type": "Status",
+    "target": "None",
+    "effects": [
+      { "type": "exhaust" }
+    ],
+    "upgraded": {
+      "cost": 0,
+      "effects": []
+    }
+  },
+  {
+    "id": "burn",
+    "name": "Burn",
+    "rarity": "Special",
+    "cost": -1,
+    "type": "Status",
+    "target": "None",
+    "effects": [
+      { "type": "unplayable" },
+      { "type": "end_of_turn_damage", "value": 2 }
+    ],
+    "upgraded": {
+      "cost": -1,
+      "effects": [
+        { "type": "unplayable" },
+        { "type": "end_of_turn_damage", "value": 4 }
+      ]
+    }
+  },
+  {
+    "id": "dazed",
+    "name": "Dazed",
+    "rarity": "Special",
+    "cost": -1,
+    "type": "Status",
+    "target": "None",
+    "effects": [
+      { "type": "unplayable" },
+      { "type": "ethereal" }
+    ]
+  },
+  {
+    "id": "wound",
+    "name": "Wound",
+    "rarity": "Special",
+    "cost": -1,
+    "type": "Status",
+    "target": "None",
+    "effects": [
+      { "type": "unplayable" }
+    ]
+  }
+]

@@ -1,0 +1,143 @@
+QMainWindow, QWidget {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 13px;
+}
+
+/* Gameplay pages/scenes are transparent so the cover background QLabel shows through. */
+QWidget#gameplayPage, QWidget#gameplayScene {
+    background-color: transparent;
+}
+
+QLabel#gameplayBackground {
+    background-color: transparent;
+    border: none;
+}
+
+QPushButton {
+    background-color: #16213e;
+    color: #e0e0e0;
+    border: 1px solid #0f3460;
+    border-radius: 6px;
+    padding: 8px 16px;
+    min-height: 28px;
+}
+
+QPushButton:hover {
+    background-color: #0f3460;
+    border-color: #e94560;
+}
+
+QPushButton:pressed {
+    background-color: #e94560;
+}
+
+QPushButton:disabled {
+    background-color: #2a2a3e;
+    color: #666;
+    border-color: #333;
+}
+
+QProgressBar {
+    border: 1px solid #0f3460;
+    border-radius: 4px;
+    background-color: #16213e;
+    text-align: center;
+    color: #fff;
+    max-height: 22px;
+}
+
+QProgressBar::chunk {
+    background-color: #e94560;
+    border-radius: 3px;
+}
+
+QProgressBar#enemyHpBar::chunk {
+    background-color: #9b59b6;
+}
+
+QProgressBar#playerHpBar::chunk {
+    background-color: #27ae60;
+}
+
+QLabel#titleLabel {
+    font-size: 28px;
+    font-weight: bold;
+    color: #e94560;
+}
+
+QLabel#stepLabel {
+    font-size: 14px;
+    color: #a0a0c0;
+    padding: 4px;
+}
+
+QLabel#mapStepLabel, QWidget#mapLegendBar {
+    background-color: #16213e;
+    color: #e0e0e0;
+    border: 1px solid #0f3460;
+}
+
+QLabel#mapStepLabel {
+    font-size: 36px;
+    padding-left: 16px;
+}
+
+QWidget#mapLegendBar {
+    padding: 0px;
+}
+
+QLabel#mapLegendItemLabel {
+    font-size: 14px;
+    color: #e0e0e0;
+    background-color: transparent;
+    border: none;
+}
+
+QDialog {
+    background-color: #1a1a2e;
+}
+
+QGraphicsView {
+    border: 1px solid #0f3460;
+    background-color: #2a2a3e;
+}
+
+QWidget#playerStatusBar {
+    background-color: #16213e;
+    border: 1px solid #0f3460;
+}
+
+QLabel#playerHpLabel, QLabel#playerGoldLabel, QLabel#playerBlockLabel {
+    font-size: 20px;
+    color: #ffffff;
+    background-color: transparent;
+    border: none;
+}
+
+QFrame#portraitPlaceholder {
+    background-color: transparent;
+    border: none;
+}
+
+QLabel#portraitPlaceholderLabel {
+    color: #666666;
+    font-size: 24px;
+    background-color: transparent;
+    border: none;
+}
+
+QLabel#potionSlot {
+    background-color: #2a2a3e;
+    border: 1px solid #0f3460;
+    font-size: 14px;
+    color: #e0e0e0;
+}
+
+QLabel#relicSlot {
+    background-color: #2a2a3e;
+    border: 1px solid #0f3460;
+    font-size: 10px;
+    color: #666666;
+}

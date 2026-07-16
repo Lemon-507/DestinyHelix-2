@@ -1,0 +1,119 @@
+[
+  {
+    "id": "block_potion",
+    "name": "Block Potion",
+    "description": "Gain 12 Block.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "gain_block", "value": 12, "target": "self" }
+    ]
+  },
+  {
+    "id": "blood_potion",
+    "name": "Blood Potion",
+    "description": "Restore 20% of max HP. Can be used at any time.",
+    "allowed_contexts": ["non_combat", "combat_player_turn"],
+    "effects": [
+      { "type": "restore_hp_percent", "value": 20, "target": "self" }
+    ]
+  },
+  {
+    "id": "dexterity_potion",
+    "name": "Dexterity Potion",
+    "description": "Gain 2 Dexterity.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "apply_power", "power": "dexterity", "value": 2, "target": "self" }
+    ]
+  },
+  {
+    "id": "energy_potion",
+    "name": "Energy Potion",
+    "description": "Gain 2 Energy.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "gain_energy", "value": 2, "target": "self" }
+    ]
+  },
+  {
+    "id": "explosive_potion",
+    "name": "Explosive Potion",
+    "description": "Deal 10 damage to all enemies.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "deal_damage", "value": 10, "target": "all_enemies" }
+    ]
+  },
+  {
+    "id": "fear_potion",
+    "name": "Fear Potion",
+    "description": "Apply 3 Vulnerable to an enemy.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "apply_power", "power": "vulnerable", "value": 3, "target": "selected_enemy" }
+    ]
+  },
+  {
+    "id": "fire_potion",
+    "name": "Fire Potion",
+    "description": "Deal 20 damage.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "deal_damage", "value": 20, "target": "selected_enemy" }
+    ]
+  },
+  {
+    "id": "strength_potion",
+    "name": "Strength Potion",
+    "description": "Gain 2 Strength.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "apply_power", "power": "strength", "value": 2, "target": "self" }
+    ]
+  },
+  {
+    "id": "swift_potion",
+    "name": "Swift Potion",
+    "description": "Draw 3 cards.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "draw_card", "value": 3, "target": "self" }
+    ]
+  },
+  {
+    "id": "weakness_potion",
+    "name": "Weakness Potion",
+    "description": "Apply 3 Weak to an enemy.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "apply_power", "power": "weak", "value": 3, "target": "selected_enemy" }
+    ]
+  },
+  {
+    "id": "ancient_potion",
+    "name": "Ancient Potion",
+    "description": "Gain 1 Artifact.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "apply_power", "power": "artifact", "value": 1, "target": "self" }
+    ]
+  },
+  {
+    "id": "cultist_potion",
+    "name": "Cultist Potion",
+    "description": "Gain 1 Ritual.",
+    "allowed_contexts": ["combat_player_turn"],
+    "effects": [
+      { "type": "apply_power", "power": "ritual", "value": 1, "target": "self" }
+    ]
+  },
+  {
+    "id": "fruit_juice",
+    "name": "Fruit Juice",
+    "description": "Increase max HP by 5. Can be used at any time.",
+    "allowed_contexts": ["non_combat", "combat_player_turn"],
+    "effects": [
+      { "type": "max_hp_increase", "value": 5, "target": "self" }
+    ]
+  }
+]

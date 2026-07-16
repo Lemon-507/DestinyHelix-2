@@ -1,0 +1,2 @@
+********* Start testing of TestSkeleton *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)

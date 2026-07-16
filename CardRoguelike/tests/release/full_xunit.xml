@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" tests="8" name="TestEnemies">
+  <properties>
+    <property value="5.14.2" name="QTestVersion"/>
+    <property value="5.14.2" name="QtVersion"/>
+    <property value="Qt 5.14.2 (x86_64&#x002D;little_endian&#x002D;llp64 shared (dynamic) release build; by GCC 7.3.0)" name="QtBuild"/>
+  </properties>
+  <testcase result="pass" name="initTestCase"/>
+  <testcase result="pass" name="test_enemy_database_loads_cultist"/>
+  <testcase result="pass" name="test_cultist_sequence_intents"/>
+  <testcase result="pass" name="test_jaw_worm_probability_restriction"/>
+  <testcase result="pass" name="test_cultist_ritual_strength_in_combat"/>
+  <testcase result="pass" name="test_vulnerable_increases_damage_taken"/>
+  <testcase result="pass" name="test_weak_reduces_damage_dealt"/>
+  <testcase result="pass" name="cleanupTestCase"/>
+  <system-err/>
+</testsuite>

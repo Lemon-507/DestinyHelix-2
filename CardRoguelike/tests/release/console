@@ -1,0 +1,44 @@
+********* Start testing of TestEnemies *********
+Config: Using QtTest library 5.14.2, Qt 5.14.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 7.3.0)
+INFO   : TestEnemies::initTestCase() entering
+PASS   : TestEnemies::initTestCase()
+INFO   : TestEnemies::test_enemy_database_loads_cultist() entering
+INFO   : TestEnemies::test_enemy_database_loads_cultist() QCOMPARE(cultist->name, QStringLiteral("Cultist"))
+unit\test_enemies.cpp(42) : failure location
+INFO   : TestEnemies::test_enemy_database_loads_cultist() QCOMPARE(cultist->type, QStringLiteral("normal"))
+unit\test_enemies.cpp(43) : failure location
+INFO   : TestEnemies::test_enemy_database_loads_cultist() QCOMPARE(cultist->intents.size(), 2)
+unit\test_enemies.cpp(44) : failure location
+INFO   : TestEnemies::test_enemy_database_loads_cultist() QCOMPARE(cultist->behavior.type, QStringLiteral("initial_then_loop"))
+unit\test_enemies.cpp(45) : failure location
+INFO   : TestEnemies::test_enemy_database_loads_cultist() QCOMPARE(cultist->behavior.loopSequence.size(), 1)
+unit\test_enemies.cpp(46) : failure location
+INFO   : TestEnemies::test_enemy_database_loads_cultist() QCOMPARE(cultist->behavior.loopSequence.at(0), 1)
+unit\test_enemies.cpp(47) : failure location
+PASS   : TestEnemies::test_enemy_database_loads_cultist()
+INFO   : TestEnemies::test_cultist_sequence_intents() entering
+INFO   : TestEnemies::test_cultist_sequence_intents() QCOMPARE(firstPeek.name, QStringLiteral("Incantation"))
+unit\test_enemies.cpp(56) : failure location
+INFO   : TestEnemies::test_cultist_sequence_intents() QCOMPARE(first.name, QStringLiteral("Incantation"))
+unit\test_enemies.cpp(59) : failure location
+INFO   : TestEnemies::test_cultist_sequence_intents() QCOMPARE(secondPeek.name, QStringLiteral("Dark Strike"))
+unit\test_enemies.cpp(62) : failure location
+INFO   : TestEnemies::test_cultist_sequence_intents() QCOMPARE(second.name, QStringLiteral("Dark Strike"))
+unit\test_enemies.cpp(65) : failure location
+INFO   : TestEnemies::test_cultist_sequence_intents() QCOMPARE(thirdPeek.name, QStringLiteral("Dark Strike"))
+unit\test_enemies.cpp(68) : failure location
+PASS   : TestEnemies::test_cultist_sequence_intents()
+INFO   : TestEnemies::test_jaw_worm_probability_restriction() entering
+INFO   : TestEnemies::test_jaw_worm_probability_restriction() QCOMPARE(thrashRepeats, 0)
+unit\test_enemies.cpp(91) : failure location
+PASS   : TestEnemies::test_jaw_worm_probability_restriction()
+INFO   : TestEnemies::test_cultist_ritual_strength_in_combat() entering
+INFO   : TestEnemies::test_cultist_ritual_strength_in_combat() QCOMPARE(cultist.strength(), 0)
+unit\test_enemies.cpp(106) : failure location
+INFO   : TestEnemies::test_cultist_ritual_strength_in_combat() QCOMPARE(cultist.strength(), 0)
+unit\test_enemies.cpp(109) : failure location
+FAIL!  : TestEnemies::test_cultist_ritual_strength_in_combat() Compared values are not the same
+   Actual   (cultist.strength()): 3
+   Expected (0)                 : 0
+unit\test_enemies.cpp(109) : failure location
+INFO   : TestEnemies::test_vulnerable_increases_damage_taken() entering
