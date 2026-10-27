@@ -67,9 +67,10 @@ class EffectResolver
 public:
     static EffectResolver &instance();
 
-    void execute(const QVector<EffectDef> &effects, Actor *caster, Actor *target,
+    bool execute(const QVector<EffectDef> &effects, Actor *caster, Actor *target,
                  const QVector<Actor *> &allEnemies = {}, BattleFSM *battleFsm = nullptr,
-                 const QString &sourceCardId = QString());
+                 const QString &sourceCardId = QString(), class MapManager *mapManager = nullptr,
+                 int selectedDeckIndex = -1, bool stopOnDeath = false);
 
 private:
     EffectResolver() = default;

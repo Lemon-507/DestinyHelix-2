@@ -15,7 +15,8 @@ INCLUDEPATH += \
     potions \
     save \
     systems \
-    utils
+    utils \
+    economy
 
 RESOURCES += resources.qrc
 
@@ -36,6 +37,8 @@ HEADERS += \
     battle/logic/intention_sm.h \
     battle/logic/relic_manager.h \
     battle/logic/card_text.h \
+    battle/logic/effect_types.h \
+    battle/logic/play_result.h \
     battle/data/card_database.h \
     battle/data/enemy_database.h \
     battle/data/enemy_pool.h \
@@ -49,7 +52,8 @@ HEADERS += \
     save/game_state.h \
     save/save_manager.h \
     utils/rng.h \
-    utils/json_utils.h
+    utils/json_utils.h \
+    economy/run_economy.h
 
 SOURCES += \
     map/map_manager.cpp \
@@ -78,4 +82,5 @@ SOURCES += \
     game_manager.cpp \
     systems/event_bus.cpp \
     save/save_manager.cpp \
-    utils/rng.cpp
+    utils/rng.cpp \
+    economy/run_economy.cpp

@@ -80,6 +80,11 @@ bool Card::isUpgraded() const
     return m_data.id.endsWith(QStringLiteral("+"));
 }
 
+bool Card::isPlayable() const
+{
+    return m_data.baseCost >= 0 && !hasEffectType(QStringLiteral("unplayable"));
+}
+
 bool Card::hasEffectType(const QString &effectType) const
 {
     for (const EffectDef &effect : m_data.effects) {

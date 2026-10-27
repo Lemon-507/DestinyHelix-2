@@ -4,6 +4,8 @@
 #include <QtCore/QString>
 #include <QtCore/QVector>
 
+#include "economy/run_economy.h"
+
 class GameManager;
 
 class ShopViewModel : public QObject
@@ -54,23 +56,12 @@ signals:
     void purchaseDenied(const QString &reason);
 
 private:
-    struct CardCandidate {
-        QString id;
-        QString name;
-        QString rarity;
-    };
-
-    void generateStock();
-    bool tryPurchase(ShopSlot &slot);
+    void refreshFromGameManager();
+    bool applyPurchase(ShopOfferKind kind, int index);
     int playerPotionTotal() const;
-    static int priceForCardRarity(const QString &rarity);
-    static QVector<CardCandidate> loadPurchasableCards();
-    static QStringList loadPotionIds();
-    static QString pickUnique(QStringList &candidates);
 
     GameManager *m_gameManager = nullptr;
     QVector<ShopSlot> m_cardSlots;
     QVector<ShopSlot> m_relicSlots;
     QVector<ShopSlot> m_potionSlots;
-    bool m_hasDeletedThisVisit = false;
 };

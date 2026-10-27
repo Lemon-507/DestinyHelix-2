@@ -1255,8 +1255,7 @@ void BattleView::executeCardPlay(CardWidget *widget, const QString &cardId, int 
     }
 
     const QVariantMap cardEntry = hand.at(handIndex).toMap();
-    if (!cardEntry.value(QStringLiteral("playable"), true).toBool()
-        || !m_viewModel->canAffordCard(cardEntry.value(QStringLiteral("cost")).toInt())) {
+    if (!m_viewModel->canAffordCard(handIndex)) {
         clearCardSelection();
         return;
     }
@@ -1591,13 +1590,7 @@ bool BattleView::isHandIndexAffordable(int handIndex) const
         return false;
     }
 
-    const QVariantMap entry = hand.at(handIndex).toMap();
-    if (!entry.value(QStringLiteral("playable"), true).toBool()) {
-        return false;
-    }
-
-    const int cost = entry.value(QStringLiteral("cost")).toInt();
-    return m_viewModel->canAffordCard(cost);
+    return m_viewModel->canAffordCard(handIndex);
 }
 
 void BattleView::applyCardAffordabilityStates()

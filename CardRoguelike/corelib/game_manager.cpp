@@ -6,14 +6,17 @@
 #include "battle/data/enemy_database.h"
 #include "battle/data/enemy_pool.h"
 #include "battle/data/relic_database.h"
+#include "battle/entities/actor.h"
 #include "battle/entities/card.h"
 #include "battle/entities/enemy.h"
 #include "battle/entities/player.h"
+#include "battle/logic/battlefsm.h"
 #include "battle/logic/relic_manager.h"
 #include "character_factory.h"
 #include "events/event_database.h"
 #include "events/event_manager.h"
 #include "map/map_manager.h"
+#include "potions/potion_database.h"
 #include "save/save_manager.h"
 #include "systems/event_bus.h"
 #include "utils/rng.h"
@@ -22,21 +25,34 @@ GameManager::GameManager(QObject *parent)
     : QObject(parent)
     , m_eventManager(this)
     , m_relicManager(std::make_unique<RelicManager>(this))
+    , m_battleFsm(std::make_unique<BattleFSM>())
 {
     qRegisterMetaType<EventData>("EventData");
     connectMapSignals();
+    connect(m_battleFsm.get(), &BattleFSM::enemiesChanged, this, [this]() {
+        updateRelicBattleContext();
+    });
 }
 
-GameManager::~GameManager() = default;
+GameManager::~GameManager()
+{
+    if (m_relicManager != nullptr) {
+        m_relicManager->clearBattleContext();
+    }
+}
 
 void GameManager::startNewGame(const QString &characterId, int mapSeed)
 {
+    if (m_relicManager != nullptr) {
+        m_relicManager->clearBattleContext();
+    }
+    clearCombatEncounter();
+
     CharacterFactory::initialize();
     m_player.reset(CharacterFactory::createCharacter(characterId));
     m_mapSeed = mapSeed;
     m_normalNodesCleared = 0;
     m_shopDeletionCount = 0;
-    clearCombatEncounter();
 
     m_mapManager.generateMap(mapSeed);
     m_mapSeed = m_mapManager.mapSeed();
@@ -46,8 +62,6 @@ void GameManager::startNewGame(const QString &characterId, int mapSeed)
 
     m_relicManager->clear();
     registerPlayerRelics();
-
-    connectMapSignals();
 }
 
 void GameManager::addRelic(const QString &relicId)
@@ -177,6 +191,186 @@ int GameManager::shopDeletionCount() const
 void GameManager::incrementShopDeletionCount()
 {
     ++m_shopDeletionCount;
+}
+
+int GameManager::cardDeletionPrice() const
+{
+    return 50 + m_shopDeletionCount * 25;
+}
+
+bool GameManager::hasDeletedCardThisShopVisit() const
+{
+    return m_shopDeletedThisVisit;
+}
+
+bool GameManager::canDeleteCardAtShop() const
+{
+    return m_player != nullptr && !m_shopDeletedThisVisit && !m_player->deck().isEmpty()
+           && m_player->gold() >= cardDeletionPrice();
+}
+
+void GameManager::rollShopStock()
+{
+    m_shopDeletedThisVisit = false;
+    m_shopStock = generateShopStock();
+}
+
+const ShopStock &GameManager::shopStock() const
+{
+    return m_shopStock;
+}
+
+namespace {
+
+int playerPotionTotal(const Player *player)
+{
+    if (player == nullptr) {
+        return 0;
+    }
+
+    int total = 0;
+    const QHash<QString, int> counts = player->potionCounts();
+    for (auto it = counts.constBegin(); it != counts.constEnd(); ++it) {
+        if (it.value() > 0) {
+            total += it.value();
+        }
+    }
+    return total;
+}
+
+QVector<ShopOffer> *shopSlots(ShopStock &stock, ShopOfferKind kind)
+{
+    switch (kind) {
+    case ShopOfferKind::Card:
+        return &stock.cards;
+    case ShopOfferKind::Relic:
+        return &stock.relics;
+    case ShopOfferKind::Potion:
+        return &stock.potions;
+    }
+    return nullptr;
+}
+
+} // namespace
+
+TransactionResult GameManager::purchaseShopOffer(ShopOfferKind kind, int index)
+{
+    QVector<ShopOffer> *offers = shopSlots(m_shopStock, kind);
+    if (offers == nullptr || m_player == nullptr || index < 0 || index >= offers->size()) {
+        return {};
+    }
+
+    ShopOffer &offer = (*offers)[index];
+    if (offer.sold || offer.itemId.isEmpty()) {
+        return {};
+    }
+
+    if (kind == ShopOfferKind::Potion && playerPotionTotal(m_player.get()) >= 3) {
+        return TransactionResult{false, QStringLiteral("Potion belt full")};
+    }
+
+    if (m_player->gold() < offer.price) {
+        return TransactionResult{false, QStringLiteral("Not enough gold")};
+    }
+
+    m_player->setGold(m_player->gold() - offer.price);
+
+    switch (kind) {
+    case ShopOfferKind::Card: {
+        CardDatabase::instance().load();
+        const Card card = CardDatabase::instance().getCard(offer.itemId);
+        if (!card.id().isEmpty()) {
+            m_player->addCardToDeck(card);
+        }
+        break;
+    }
+    case ShopOfferKind::Relic:
+        addRelic(offer.itemId);
+        break;
+    case ShopOfferKind::Potion:
+        m_player->addPotion(offer.itemId, 1);
+        break;
+    }
+
+    offer.sold = true;
+    return TransactionResult{true, QString()};
+}
+
+TransactionResult GameManager::deleteCardAtShop(int deckIndex)
+{
+    if (m_player == nullptr) {
+        return {};
+    }
+    if (m_shopDeletedThisVisit) {
+        return TransactionResult{false, QStringLiteral("Already deleted a card this visit")};
+    }
+
+    const int price = cardDeletionPrice();
+    if (m_player->gold() < price || m_player->deck().isEmpty()) {
+        return TransactionResult{false, QStringLiteral("Not enough gold")};
+    }
+    if (!m_player->removeCardAt(deckIndex)) {
+        return {};
+    }
+
+    m_player->setGold(m_player->gold() - price);
+    m_shopDeletedThisVisit = true;
+    incrementShopDeletionCount();
+    return TransactionResult{true, QString()};
+}
+
+void GameManager::rollRewards()
+{
+    NodeType nodeType = NodeType::NormalEnemy;
+    if (m_mapManager.playerX() >= 0 && m_mapManager.playerY() >= 0) {
+        nodeType = m_mapManager.nodeType(m_mapManager.playerX(), m_mapManager.playerY());
+    }
+
+    QStringList ownedRelics;
+    if (m_player != nullptr) {
+        ownedRelics = m_player->relicIds();
+    }
+    m_rewardOffers = generateRewardOffers(nodeType, ownedRelics);
+}
+
+const QVector<RewardOfferData> &GameManager::rewardOffers() const
+{
+    return m_rewardOffers;
+}
+
+bool GameManager::claimReward(int index)
+{
+    if (m_player == nullptr || index < 0 || index >= m_rewardOffers.size()) {
+        return false;
+    }
+
+    RewardOfferData &offer = m_rewardOffers[index];
+    if (!offer.granted || offer.claimed) {
+        return false;
+    }
+
+    switch (offer.kind) {
+    case RewardOfferKind::Gold:
+        m_player->addGold(offer.goldAmount);
+        break;
+    case RewardOfferKind::Potion:
+        m_player->addPotion(offer.itemId, 1);
+        break;
+    case RewardOfferKind::Card: {
+        CardDatabase::instance().load();
+        const Card card = CardDatabase::instance().getCard(offer.itemId);
+        if (!card.id().isEmpty()) {
+            m_player->addCardToDeck(card);
+        }
+        break;
+    }
+    case RewardOfferKind::Relic:
+        addRelic(offer.itemId);
+        break;
+    }
+
+    offer.claimed = true;
+    return true;
 }
 
 MapManager *GameManager::mapManager()
@@ -329,22 +523,30 @@ void GameManager::connectMapSignals()
 
 QVector<Enemy *> GameManager::currentEncounterEnemies() const
 {
-    QVector<Enemy *> enemies;
-    enemies.reserve(static_cast<int>(m_encounterEnemies.size()));
-    for (const std::unique_ptr<Enemy> &enemy : m_encounterEnemies) {
-        enemies.append(enemy.get());
+    if (!m_encounterEnemies.empty()) {
+        QVector<Enemy *> enemies;
+        enemies.reserve(static_cast<int>(m_encounterEnemies.size()));
+        for (const std::unique_ptr<Enemy> &enemy : m_encounterEnemies) {
+            enemies.append(enemy.get());
+        }
+        return enemies;
     }
-    return enemies;
+
+    if (m_battleFsm != nullptr) {
+        return m_battleFsm->enemies();
+    }
+    return {};
 }
 
 Enemy *GameManager::activeEncounterEnemy() const
 {
-    for (const std::unique_ptr<Enemy> &enemy : m_encounterEnemies) {
+    const QVector<Enemy *> enemies = currentEncounterEnemies();
+    for (Enemy *enemy : enemies) {
         if (enemy != nullptr && enemy->currentHp() > 0) {
-            return enemy.get();
+            return enemy;
         }
     }
-    return m_encounterEnemies.empty() ? nullptr : m_encounterEnemies.front().get();
+    return enemies.isEmpty() ? nullptr : enemies.front();
 }
 
 int GameManager::normalNodesCleared() const
@@ -397,6 +599,202 @@ void GameManager::recordCombatVictory()
 void GameManager::clearCombatEncounter()
 {
     m_encounterEnemies.clear();
+    if (m_battleFsm != nullptr) {
+        m_battleFsm->releaseEncounter();
+    }
+}
+
+void GameManager::startCombat()
+{
+    if (m_player == nullptr || m_battleFsm == nullptr || m_encounterEnemies.empty()) {
+        return;
+    }
+
+    std::vector<std::unique_ptr<Enemy>> owned = std::move(m_encounterEnemies);
+    m_encounterEnemies.clear();
+
+    QVector<Enemy *> enemies;
+    enemies.reserve(static_cast<int>(owned.size()));
+    for (const std::unique_ptr<Enemy> &enemy : owned) {
+        if (enemy != nullptr) {
+            enemies.append(enemy.get());
+        }
+    }
+
+    m_battleFsm->adoptEncounter(std::move(owned));
+    if (enemies.isEmpty()) {
+        m_battleFsm->releaseEncounter();
+        return;
+    }
+
+    const int shrinkCount = m_mapManager.combatShrinkCount();
+    m_battleFsm->startCombat(m_player.get(), enemies, shrinkCount);
+    updateRelicBattleContext();
+}
+
+PlayResult GameManager::playCard(int handIndex, int enemyIndex)
+{
+    if (m_player == nullptr || m_battleFsm == nullptr) {
+        return PlayResult::failure(QStringLiteral("No active combat"));
+    }
+    if (m_battleFsm->battleState() != BattleState::PlayerTurn) {
+        return PlayResult::failure(QStringLiteral("Not the player turn"));
+    }
+
+    const QVector<Card> hand = m_battleFsm->hand();
+    if (handIndex < 0 || handIndex >= hand.size()) {
+        return PlayResult::failure(QStringLiteral("Invalid hand index"));
+    }
+
+    const Card &card = hand.at(handIndex);
+    if (!card.isPlayable()) {
+        return PlayResult::failure(QStringLiteral("Card cannot be played"));
+    }
+    if (card.cost() > m_battleFsm->currentEnergy()) {
+        return PlayResult::failure(QStringLiteral("Not enough energy"));
+    }
+
+    Actor *target = nullptr;
+    if (card.data().target == TargetType::Self) {
+        target = m_player.get();
+    } else if (card.data().target == TargetType::AllEnemies) {
+        for (Enemy *enemy : currentEncounterEnemies()) {
+            if (enemy != nullptr && enemy->currentHp() > 0) {
+                target = enemy;
+                break;
+            }
+        }
+        if (target == nullptr) {
+            return PlayResult::failure(QStringLiteral("No living enemy"));
+        }
+    } else {
+        const QVector<Enemy *> enemies = currentEncounterEnemies();
+        if (enemyIndex < 0 || enemyIndex >= enemies.size()) {
+            return PlayResult::failure(QStringLiteral("Invalid enemy index"));
+        }
+        Enemy *enemy = enemies.at(enemyIndex);
+        if (enemy == nullptr || enemy->currentHp() <= 0) {
+            return PlayResult::failure(QStringLiteral("Enemy is already defeated"));
+        }
+        target = enemy;
+    }
+
+    return m_battleFsm->playCard(card, target);
+}
+
+void GameManager::endPlayerTurn()
+{
+    if (m_battleFsm == nullptr || m_battleFsm->battleState() != BattleState::PlayerTurn) {
+        return;
+    }
+    m_battleFsm->playerEndTurn();
+}
+
+PlayResult GameManager::usePotion(const QString &potionId, int enemyIndex)
+{
+    if (m_player == nullptr || m_player->currentHp() <= 0) {
+        return PlayResult::failure(QStringLiteral("Potion cannot be used"));
+    }
+    if (m_player->potionCount(potionId) <= 0) {
+        return PlayResult::failure(QStringLiteral("No potion available"));
+    }
+
+    PotionDatabase::instance().load();
+    const PotionData potion = PotionDatabase::instance().getPotion(potionId);
+    if (potion.id.isEmpty() || !PotionDatabase::instance().canUse(potion, potionContext())) {
+        return PlayResult::failure(QStringLiteral("Potion cannot be used"));
+    }
+
+    QString primaryTarget = QStringLiteral("self");
+    if (!potion.effects.isEmpty() && !potion.effects.first().target.isEmpty()) {
+        primaryTarget = potion.effects.first().target;
+    }
+
+    Actor *target = m_player.get();
+    if (primaryTarget == QStringLiteral("selected_enemy")) {
+        const QVector<Enemy *> enemies = currentEncounterEnemies();
+        if (enemyIndex < 0 || enemyIndex >= enemies.size()) {
+            return PlayResult::failure(QStringLiteral("Invalid enemy index"));
+        }
+        Enemy *enemy = enemies.at(enemyIndex);
+        if (enemy == nullptr || enemy->currentHp() <= 0) {
+            return PlayResult::failure(QStringLiteral("Enemy is already defeated"));
+        }
+        target = enemy;
+    }
+
+    QVector<Actor *> allEnemies;
+    for (Enemy *enemy : currentEncounterEnemies()) {
+        if (enemy != nullptr && enemy->currentHp() > 0) {
+            allEnemies.append(enemy);
+        }
+    }
+
+    if (primaryTarget == QStringLiteral("all_enemies") && allEnemies.isEmpty()) {
+        return PlayResult::failure(QStringLiteral("No living enemy"));
+    }
+
+    PotionDatabase::instance().usePotion(potion, m_player.get(), target, allEnemies, m_battleFsm.get());
+    m_player->setPotionCount(potionId, m_player->potionCount(potionId) - 1);
+    EventBus::instance().triggerPotionUsed();
+    return PlayResult::success();
+}
+
+void GameManager::finishCombat(bool playerWon)
+{
+    if (m_battleFsm != nullptr && m_battleFsm->battleState() != BattleState::Ended) {
+        m_battleFsm->concludeCombat(playerWon);
+    }
+    if (m_relicManager != nullptr) {
+        m_relicManager->clearBattleContext();
+    }
+    if (!playerWon) {
+        clearCombatEncounter();
+    }
+}
+
+BattleFSM *GameManager::battleFsm() const
+{
+    return m_battleFsm.get();
+}
+
+void GameManager::updateRelicBattleContext()
+{
+    if (m_relicManager == nullptr || m_battleFsm == nullptr) {
+        return;
+    }
+
+    const BattleState state = m_battleFsm->battleState();
+    if (state == BattleState::Idle || state == BattleState::Ended) {
+        return;
+    }
+
+    QVector<Actor *> battleEnemies;
+    for (Enemy *enemy : m_battleFsm->enemies()) {
+        if (enemy != nullptr) {
+            battleEnemies.append(enemy);
+        }
+    }
+    m_relicManager->setBattleContext(m_battleFsm.get(), battleEnemies);
+}
+
+GameContext GameManager::potionContext() const
+{
+    if (m_battleFsm == nullptr) {
+        return GameContext::NonCombat;
+    }
+
+    switch (m_battleFsm->battleState()) {
+    case BattleState::PlayerTurn:
+        return GameContext::CombatPlayerTurn;
+    case BattleState::PlayerTurnStart:
+    case BattleState::EnemyTurn:
+        return GameContext::CombatAny;
+    case BattleState::Idle:
+    case BattleState::Ended:
+        break;
+    }
+    return GameContext::NonCombat;
 }
 
 void GameManager::prepareCombatEncounter(int x, int y)

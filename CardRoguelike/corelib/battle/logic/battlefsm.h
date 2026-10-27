@@ -10,6 +10,7 @@
 
 #include "battle/entities/card.h"
 #include "battle/entities/enemy.h"
+#include "battle/logic/play_result.h"
 
 class Player;
 class ShrinkDamagePower;
@@ -41,11 +42,13 @@ public:
     ShrinkDamagePower *shrinkPower() const;
     int cardDamageBonus(const QString &cardId) const;
     QVector<Enemy *> enemies() const;
+    void adoptEncounter(std::vector<std::unique_ptr<Enemy>> enemies);
+    void releaseEncounter();
 
 public slots:
     void startCombat(Player *player, const QVector<Enemy *> &enemies, int shrinkCount = 0);
     void playerEndTurn();
-    void playCard(Card card, Actor *target);
+    PlayResult playCard(Card card, Actor *target);
 
     void drawExtraCards(int count);
     void gainEnergy(int amount);
@@ -83,6 +86,7 @@ private:
 
     Player *m_player = nullptr;
     QVector<Enemy *> m_enemies;
+    std::vector<std::unique_ptr<Enemy>> m_encounterOwned;
     std::vector<std::unique_ptr<Enemy>> m_ownedEnemies;
     Enemy *m_enemy = nullptr;
     int m_currentEnergy = 0;

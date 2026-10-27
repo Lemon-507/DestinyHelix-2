@@ -1,8 +1,99 @@
+#include <QtCore/QFile>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QSet>
+#include <QtCore/QVector>
 #include <QtTest>
 
 #include "battle/data/card_database.h"
 #include "battle/entities/card.h"
 #include "battle/logic/card_text.h"
+#include "battle/logic/effect_types.h"
+
+namespace {
+
+void collectEffectTypes(const QJsonValue &value, QSet<QString> *types)
+{
+    if (value.isArray()) {
+        const QJsonArray array = value.toArray();
+        for (const QJsonValue &child : array) {
+            collectEffectTypes(child, types);
+        }
+        return;
+    }
+    if (!value.isObject()) {
+        return;
+    }
+
+    const QJsonObject object = value.toObject();
+    const QJsonArray effects = object.value(QStringLiteral("effects")).toArray();
+    for (const QJsonValue &effectValue : effects) {
+        const QString type = effectValue.toObject().value(QStringLiteral("type")).toString();
+        if (!type.isEmpty()) {
+            types->insert(type);
+        }
+    }
+
+    for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
+        if (it.key() == QStringLiteral("effects")) {
+            continue;
+        }
+        collectEffectTypes(it.value(), types);
+    }
+}
+
+QVector<EffectDef> cardEffectsIn(const QJsonValue &value)
+{
+    QVector<EffectDef> effects;
+    if (value.isArray()) {
+        const QJsonArray array = value.toArray();
+        for (const QJsonValue &child : array) {
+            effects += cardEffectsIn(child);
+        }
+        return effects;
+    }
+    if (!value.isObject()) {
+        return effects;
+    }
+
+    const QJsonObject object = value.toObject();
+    const QJsonArray effectArray = object.value(QStringLiteral("effects")).toArray();
+    for (const QJsonValue &effectValue : effectArray) {
+        const QJsonObject effectObject = effectValue.toObject();
+        EffectDef effect;
+        effect.type = effectObject.value(QStringLiteral("type")).toString();
+        effect.value = effectObject.value(QStringLiteral("value")).toInt();
+        effect.target = effectObject.value(QStringLiteral("target")).toString();
+        effect.powerId = effectObject.value(QStringLiteral("power_id")).toString();
+        if (effect.powerId.isEmpty()) {
+            effect.powerId = effectObject.value(QStringLiteral("power")).toString();
+        }
+        effect.cardId = effectObject.value(QStringLiteral("card_id")).toString();
+        if (!effect.type.isEmpty()) {
+            effects.append(effect);
+        }
+    }
+
+    for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
+        if (it.key() == QStringLiteral("effects")) {
+            continue;
+        }
+        effects += cardEffectsIn(it.value());
+    }
+    return effects;
+}
+
+QJsonDocument loadResourceJson(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return {};
+    }
+    return QJsonDocument::fromJson(file.readAll());
+}
+
+} // namespace
 
 class TestCardText : public QObject
 {
@@ -11,6 +102,7 @@ class TestCardText : public QObject
 private slots:
     void initTestCase()
     {
+        Q_INIT_RESOURCE(resources);
         CardDatabase::instance().load();
     }
 
@@ -91,6 +183,41 @@ private slots:
         const Card card = CardDatabase::instance().getCard(QStringLiteral("power_through"));
         QCOMPARE(CardText::describeCard(card),
                  QStringLiteral("Add 2 Wound to your hand. Gain 15 Block."));
+    }
+
+    void test_json_effect_types_are_registered()
+    {
+        const QStringList paths = {
+            QStringLiteral(":/resources/data/cards.json"),
+            QStringLiteral(":/resources/data/relics.json"),
+            QStringLiteral(":/resources/data/events.json"),
+            QStringLiteral(":/resources/data/potions.json"),
+        };
+
+        for (const QString &path : paths) {
+            const QJsonDocument document = loadResourceJson(path);
+            QVERIFY2(!document.isNull(), qPrintable(path));
+
+            QSet<QString> types;
+            collectEffectTypes(document.isArray() ? QJsonValue(document.array())
+                                                   : QJsonValue(document.object()),
+                               &types);
+            QVERIFY2(!types.isEmpty(), qPrintable(path));
+            for (const QString &type : types) {
+                QVERIFY2(isKnownEffectType(type), qPrintable(path + QStringLiteral(": ") + type));
+            }
+        }
+
+        const QJsonDocument cards = loadResourceJson(QStringLiteral(":/resources/data/cards.json"));
+        const QVector<EffectDef> effects = cardEffectsIn(QJsonValue(cards.array()));
+        QVERIFY(!effects.isEmpty());
+        for (const EffectDef &effect : effects) {
+            if (effect.type == QStringLiteral("unplayable")) {
+                continue;
+            }
+            const QString text = CardText::describeEffect(effect, TargetType::Enemy);
+            QVERIFY2(!text.isEmpty(), qPrintable(effect.type));
+        }
     }
 };
 

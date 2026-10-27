@@ -458,6 +458,7 @@ BehaviorDef EnemyDatabase::parseBehavior(const QJsonObject &obj)
             behavior.sequence.append(value.toInt());
         }
         behavior.loop = obj.value(QStringLiteral("loop")).toBool(true);
+        parseSplitOverride(obj.value(QStringLiteral("split_override")), behavior);
         return behavior;
     }
 

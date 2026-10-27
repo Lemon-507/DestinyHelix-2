@@ -7,8 +7,13 @@ TARGET = CardRoguelikeTests
 
 INCLUDEPATH += ../corelib
 
-LIBS += -L$$OUT_PWD/../corelib/release -lcorelib
-PRE_TARGETDEPS += $$OUT_PWD/../corelib/release/libcorelib.a
+CONFIG(debug, debug|release) {
+    LIBS += -L$$OUT_PWD/../corelib/debug -lcorelib
+    PRE_TARGETDEPS += $$OUT_PWD/../corelib/debug/libcorelib.a
+} else {
+    LIBS += -L$$OUT_PWD/../corelib/release -lcorelib
+    PRE_TARGETDEPS += $$OUT_PWD/../corelib/release/libcorelib.a
+}
 
 SOURCES += \
     test_runner.cpp \

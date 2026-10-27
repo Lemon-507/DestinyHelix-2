@@ -1,0 +1,68 @@
+# CardRoguelike Project Rules (The Constitution)
+
+## Project File Map (Read before any task)
+- `DESIGN.md` — Complete technical blueprint with all systems defined.
+- `schema.json` — JSON schemas for cards, relics, potions, events, characters.
+- `events.ts` — (Conceptual) Event type literals from EventBus signals.
+- `corelib/` — Static library: MapManager, BattleFSM, EffectResolver, EventBus, GameManager.
+- `app/` — Qt Widgets UI: MapView, BattleView, CardWidget, MainWindow.
+- `tests/` — Qt Test unit tests.
+
+## Technical Stack & Constraints
+- Language: C++17, GCC 8.1.0+ (MinGW-w64).
+- Framework: Qt 5.14.2 Widgets only. NO QML.
+- Build: qmake, `CONFIG += c++17`. Core logic compiled as static library `corelib` (depends only on QtCore).
+- Serialization: QJsonDocument / QJsonObject.
+- Math expressions: exprtk (header-only) for dynamic card values, but pre‑compilation not required.
+- Testing: Qt Test framework, independent executable linked to corelib.
+
+## Data Model Invariants
+- 4 entity types: MapNode, Actor (Player/Enemy), Card, Power (including Relic/Potion effects).
+- Node types: Boss, Shop, Campfire, Elite, NormalEnemy, Event, Empty.
+- Card types: Attack, Skill, Power. Rarity: Basic, Common, Uncommon, Rare.
+- EffectDef: `{ type: string, value: int, target?: string }`. All effects go through EffectResolver.
+- Save data: plain JSON, no checksums, no encryption.
+
+## Engineering Taboos (Absolute No-Go)
+- NO Static Singletons except EventBus (used as global event channel).
+- NO Deep Inheritance; prefer composition and interfaces (ICommand).
+- NO Silent Failures — use `std::optional`, `qBound`, `Q_ASSERT`, and explicit return structs (`PlayResult`).
+- NO Magic Strings for enums — use Q_ENUM_NS and QMetaEnum.
+- NO Side Effects in map/battle logic — all state changes through GameManager, events via EventBus.
+- NO QWidget in corelib; only QtCore allowed.
+
+## Data Flow Rules
+- Single Source of Truth: GameManager holds MapManager, BattleFSM, and Player state.
+- Event Bus: EventBus emits signals (battleStarted, playerTurnStarted, relicTriggered, etc.) used by relics and UI.
+- View-Model Separation: MapViewModel / BattleViewModel expose Q_PROPERTY to Views. Business data ≠ UI state.
+- Shrink Steps: totalSteps increments on node entry (+1 empty, +3 non‑empty). While loop triggers multiple shrink events if threshold crossed.
+- Undo/Redo: None. Game is single‑run, no rollback.
+
+## Mechanics & Game Rules
+- Grid: 11×11, 121 nodes. Boss at (5,5). 8 fixed start empty nodes.
+- Movement: Orthogonal only, no diagonal. All adjacent nodes reachable.
+- Explored nodes treated as Empty (step cost +1, shrink damage as Empty).
+- Shrink: 5 layers, triggered every 12 totalSteps (max 60). Damage: n on Empty, 3n on non‑empty, immediate except combat (buff). Buff updated in realtime. Boss immune. No immunity anywhere.
+- Combat: Slay the Spire style. Block clears at end of player turn. ShrinkDamagePower ignores block.
+- Player: Ironclad only at start (80 HP, 99 gold, 5 Strike/4 Defend/1 Bash, Burning Blood relic).
+- Campfire: Choose heal 30% max HP OR upgrade one card (player chooses).
+- Events: JSON scripts, effects run sequentially; death interrupts remaining effects.
+- Potions: Context‑dependent usage (non‑combat, combat_player_turn). Consumed on use.
+- Relics: Triggered via EventBus signals (OnBattleStart, OnTurnStart, OnCombatEnd, etc.). Character‑exclusive possible.
+- Victory: Defeat Boss at (5,5). Death: HP ≤ 0 at any time → game over, return to menu.
+
+## UI & Interaction Rules
+- MapView: QGraphicsView grid. Visual shrink overlay (red/purple) deepens with layers, no pop‑up warning.
+- Starting point selection: click one of 8 highlighted empty nodes.
+- BattleView: Arc hand at bottom, energy ball, intent icons, block/hp bars.
+- Theme: Dark QSS.
+- No pre‑move confirmation dialogs.
+
+## Prompting Instructions for AI
+- Always cross‑reference `DESIGN.md` and the JSON schema examples for any data structure.
+- Implement corelib changes pure and testable; UI changes only in app/.
+- When in doubt about a rule (shrink damage, block timing, explored behavior), re‑read the Mechanics section above.
+- No networking, no online features, no save tampering logic.
+- Use C++17 features: structured bindings, `if constexpr`, `std::optional`.
+- For new relics/events/potions, follow existing JSON templates exactly.
+- If a modification fails twice, restart in a new Chat thread with clean context.

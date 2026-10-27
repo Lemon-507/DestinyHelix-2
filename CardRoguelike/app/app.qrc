@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>resources/dark_theme.qss</file>
-        <file alias="art/background/main_theme.webp">../art/background/main theme.webp</file>
+        <file alias="art/background/main_theme.png">../art/background/main theme.png</file>
         <file alias="art/background/background.png">../art/background/background.png</file>
         <file alias="art/character/ironclad.png">../art/character/ironclad.png</file>
         <file alias="art/enemies/bosses/Hexaghust.png">../art/enemies/bosses/Hexaghust.png</file>

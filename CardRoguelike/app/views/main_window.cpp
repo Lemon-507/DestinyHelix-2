@@ -209,7 +209,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_mapViewModel, &MapViewModel::nextShrinkStepChanged, this, &MainWindow::refreshMapHud);
     connect(m_mapViewModel, &MapViewModel::shrinkCountChanged, this, &MainWindow::refreshMapHud);
     connect(m_mapViewModel, &MapViewModel::playerStatsChanged, this, &MainWindow::refreshPlayerPanel);
-    connect(m_gameManager, &GameManager::gameOver, this, &MainWindow::onGameOver);
 
     showMainMenu();
 }
@@ -236,7 +235,7 @@ void MainWindow::setupMainMenu()
     background->setGeometry(0, 0, 1920, 1080);
     background->setAlignment(Qt::AlignCenter);
 
-    const QPixmap source(QStringLiteral(":/art/background/main_theme.webp"));
+    const QPixmap source(QStringLiteral(":/art/background/main_theme.png"));
     if (!source.isNull()) {
         const QSize target(1920, 1080);
         QPixmap scaled = source.scaled(target, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
@@ -818,7 +817,7 @@ void MainWindow::onCampfireTriggered()
 void MainWindow::onCampfireRest()
 {
     if (m_mapViewModel != nullptr) {
-        m_mapViewModel->handleCampfireChoice(0);
+        m_mapViewModel->restAtCampfire();
         m_mapViewModel->refreshFromGameManager();
     }
     teardownCampfire();
@@ -861,12 +860,8 @@ void MainWindow::onBattleEnded(bool playerWon)
 
 void MainWindow::onRewardBackToMap()
 {
-    if (m_gameManager != nullptr) {
-        m_gameManager->recordCombatVictory();
-    }
-
     if (m_mapViewModel != nullptr) {
-        m_mapViewModel->markCurrentNodeExplored();
+        m_mapViewModel->returnFromCombatReward();
         m_mapViewModel->refreshFromGameManager();
     }
 
@@ -1019,10 +1014,6 @@ void MainWindow::showCardCollectionBrowse()
 {
     teardownCardCollection();
 
-    if (m_gameManager != nullptr && m_gameManager->player() == nullptr) {
-        m_gameManager->startNewGame(QStringLiteral("ironclad"));
-    }
-
     m_cardSelectionContext = CardSelectionContext::Browse;
     m_cardSelectionReturnPage = MainMenuPage;
 
@@ -1057,7 +1048,7 @@ void MainWindow::onCardSelected(const QString &cardId, int deckIndex)
     switch (m_cardSelectionContext) {
     case CardSelectionContext::CampfireUpgrade:
         if (m_mapViewModel != nullptr) {
-            m_mapViewModel->handleCampfireChoice(1, deckIndex);
+            m_mapViewModel->upgradeAtCampfire(deckIndex);
             m_mapViewModel->refreshFromGameManager();
         }
         teardownCardCollection();

@@ -1,8 +1,11 @@
 #include "card_collection_viewmodel.h"
 
+#include <memory>
+
 #include "battle/data/card_database.h"
 #include "battle/entities/card.h"
 #include "battle/entities/player.h"
+#include "character_factory.h"
 #include "game_manager.h"
 #include "utils/item_tooltips.h"
 
@@ -46,13 +49,23 @@ void CardCollectionViewModel::refresh()
 {
     m_cards.clear();
 
-    if (m_gameManager == nullptr || m_gameManager->player() == nullptr) {
+    std::unique_ptr<Player> previewDeck;
+    const Player *player = nullptr;
+    if (m_gameManager != nullptr && m_gameManager->player() != nullptr) {
+        player = m_gameManager->player();
+    } else if (!m_selectionMode) {
+        CharacterFactory::initialize();
+        previewDeck.reset(CharacterFactory::createCharacter(QStringLiteral("ironclad")));
+        player = previewDeck.get();
+    }
+
+    if (player == nullptr) {
         emit cardsChanged();
         return;
     }
 
     CardDatabase::instance().load();
-    const QVector<Card> &deck = m_gameManager->player()->deck();
+    const QVector<Card> &deck = player->deck();
     m_cards.reserve(deck.size());
 
     for (int i = 0; i < deck.size(); ++i) {

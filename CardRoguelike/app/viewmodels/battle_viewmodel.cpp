@@ -1,5 +1,7 @@
 #include "battle_viewmodel.h"
 
+#include <QtCore/QDebug>
+
 #include "battle/data/card_database.h"
 #include "battle/data/relic_database.h"
 #include "battle/entities/actor.h"
@@ -19,10 +21,14 @@
 BattleViewModel::BattleViewModel(GameManager *gameManager, QObject *parent)
     : QObject(parent)
     , m_gameManager(gameManager)
-    , m_battleFsm(new BattleFSM(this))
 {
     connectBattleFsm();
     connectPlayerSignals();
+}
+
+BattleFSM *BattleViewModel::battleFsm() const
+{
+    return m_gameManager != nullptr ? m_gameManager->battleFsm() : nullptr;
 }
 
 BattleViewModel::~BattleViewModel() = default;
@@ -53,8 +59,8 @@ int BattleViewModel::playerBlock() const
 
 Enemy *BattleViewModel::activeEnemy() const
 {
-    if (m_combatActive && m_battleFsm != nullptr) {
-        for (Enemy *enemy : m_battleFsm->enemies()) {
+    if (m_combatActive && battleFsm() != nullptr) {
+        for (Enemy *enemy : battleFsm()->enemies()) {
             if (enemy != nullptr && enemy->currentHp() > 0) {
                 return enemy;
             }
@@ -74,7 +80,7 @@ Enemy *BattleViewModel::enemyAtIndex(int index) const
     }
 
     const QVector<Enemy *> enemies =
-        m_battleFsm != nullptr ? m_battleFsm->enemies()
+        battleFsm() != nullptr ? battleFsm()->enemies()
                                : (m_gameManager != nullptr ? m_gameManager->currentEncounterEnemies()
                                                            : QVector<Enemy *>{});
     if (index >= enemies.size()) {
@@ -117,38 +123,39 @@ QString BattleViewModel::enemyName() const
 
 int BattleViewModel::currentEnergy() const
 {
-    return m_battleFsm->currentEnergy();
+    return battleFsm() != nullptr ? battleFsm()->currentEnergy() : 0;
 }
 
 int BattleViewModel::maxEnergy() const
 {
-    return m_battleFsm->maxEnergy();
+    return battleFsm() != nullptr ? battleFsm()->maxEnergy() : 0;
 }
 
 QString BattleViewModel::enemyIntent() const
 {
-    return m_battleFsm->enemyIntent();
+    return battleFsm() != nullptr ? battleFsm()->enemyIntent() : QString();
 }
 
 int BattleViewModel::enemyIntentValue() const
 {
-    return m_battleFsm->enemyIntentValue();
+    return battleFsm() != nullptr ? battleFsm()->enemyIntentValue() : 0;
 }
 
 QVariantList BattleViewModel::handCards() const
 {
     QVariantList cards;
-    for (const Card &card : m_battleFsm->hand()) {
+    if (battleFsm() == nullptr) {
+        return cards;
+    }
+    for (const Card &card : battleFsm()->hand()) {
         QVariantMap entry;
         entry.insert(QStringLiteral("id"), card.id());
         entry.insert(QStringLiteral("name"), cardDisplayName(card.id()));
         entry.insert(QStringLiteral("cost"), card.cost());
 
-        const bool playable =
-            card.cost() >= 0 && !card.hasEffectType(QStringLiteral("unplayable"));
-        entry.insert(QStringLiteral("playable"), playable);
+        entry.insert(QStringLiteral("playable"), card.isPlayable());
 
-        const int damageBonus = m_battleFsm->cardDamageBonus(card.id());
+        const int damageBonus = battleFsm()->cardDamageBonus(card.id());
         if (damageBonus != 0) {
             CardData adjusted = card.data();
             for (EffectDef &effect : adjusted.effects) {
@@ -180,27 +187,33 @@ bool BattleViewModel::combatActive() const
 
 bool BattleViewModel::canSelectCards() const
 {
-    return m_combatActive && m_battleFsm != nullptr
-           && m_battleFsm->battleState() == BattleState::PlayerTurn;
+    return m_combatActive && battleFsm() != nullptr
+           && battleFsm()->battleState() == BattleState::PlayerTurn;
 }
 
-bool BattleViewModel::canAffordCard(int cost) const
+bool BattleViewModel::canAffordCard(int handIndex) const
 {
-    // cost < 0 marks unplayable status cards (Wound / Burn / Dazed) in cards.json.
-    if (!canSelectCards() || cost < 0) {
+    if (!canSelectCards() || battleFsm() == nullptr || handIndex < 0) {
         return false;
     }
-    return cost <= currentEnergy();
+
+    const QVector<Card> hand = battleFsm()->hand();
+    if (handIndex >= hand.size()) {
+        return false;
+    }
+
+    const Card &card = hand.at(handIndex);
+    return card.isPlayable() && card.cost() <= currentEnergy();
 }
 
 int BattleViewModel::drawPileCount() const
 {
-    return m_battleFsm != nullptr ? m_battleFsm->drawPileCount() : 0;
+    return battleFsm() != nullptr ? battleFsm()->drawPileCount() : 0;
 }
 
 int BattleViewModel::discardPileCount() const
 {
-    return m_battleFsm != nullptr ? m_battleFsm->discardPileCount() : 0;
+    return battleFsm() != nullptr ? battleFsm()->discardPileCount() : 0;
 }
 
 int BattleViewModel::gold() const
@@ -335,7 +348,7 @@ QVariantList BattleViewModel::enemies() const
     }
 
     const QVector<Enemy *> encounter =
-        m_battleFsm != nullptr ? m_battleFsm->enemies()
+        battleFsm() != nullptr ? battleFsm()->enemies()
                                : (m_gameManager != nullptr ? m_gameManager->currentEncounterEnemies()
                                                            : QVector<Enemy *>{});
     const int limit = qMin(encounter.size(), 5);
@@ -386,7 +399,7 @@ GameContext BattleViewModel::currentPotionContext() const
     if (!m_combatActive) {
         return GameContext::NonCombat;
     }
-    if (m_battleFsm != nullptr && m_battleFsm->battleState() == BattleState::PlayerTurn) {
+    if (battleFsm() != nullptr && battleFsm()->battleState() == BattleState::PlayerTurn) {
         return GameContext::CombatPlayerTurn;
     }
     return GameContext::CombatAny;
@@ -427,73 +440,28 @@ QString BattleViewModel::potionPrimaryTarget(const QString &potionId) const
 
 void BattleViewModel::usePotion(const QString &potionId, int enemyIndex)
 {
-    if (!canUsePotion(potionId) || m_gameManager == nullptr || m_gameManager->player() == nullptr) {
+    if (m_gameManager == nullptr) {
         return;
     }
 
-    Player *player = m_gameManager->player();
-    PotionDatabase::instance().load();
-    const PotionData potion = PotionDatabase::instance().getPotion(potionId);
-    if (potion.id.isEmpty()) {
-        return;
+    const PlayResult result = m_gameManager->usePotion(potionId, enemyIndex);
+    if (!result.ok) {
+        qWarning() << "BattleViewModel: usePotion failed:" << result.reason;
     }
-
-    const QString primaryTarget = potionPrimaryTarget(potionId);
-    Actor *target = player;
-    if (primaryTarget == QStringLiteral("selected_enemy")) {
-        Enemy *enemy = enemyAtIndex(enemyIndex);
-        if (enemy == nullptr) {
-            return;
-        }
-        target = enemy;
-    }
-
-    QVector<Actor *> allEnemies;
-    const QVector<Enemy *> encounterEnemies =
-        m_battleFsm != nullptr ? m_battleFsm->enemies()
-                               : m_gameManager->currentEncounterEnemies();
-    for (Enemy *encounterEnemy : encounterEnemies) {
-        if (encounterEnemy != nullptr && encounterEnemy->currentHp() > 0) {
-            allEnemies.append(encounterEnemy);
-        }
-    }
-
-    if (primaryTarget == QStringLiteral("all_enemies") && allEnemies.isEmpty()) {
-        return;
-    }
-    if (primaryTarget == QStringLiteral("selected_enemy") && target == player) {
-        return;
-    }
-
-    PotionDatabase::instance().usePotion(potion, player, target, allEnemies, m_battleFsm);
-    player->setPotionCount(potionId, player->potionCount(potionId) - 1);
-    EventBus::instance().triggerPotionUsed();
     refreshState();
 }
 
 void BattleViewModel::startCombat()
 {
-    if (m_gameManager == nullptr || m_gameManager->player() == nullptr
-        || m_gameManager->mapManager() == nullptr) {
+    if (m_gameManager == nullptr) {
         return;
     }
 
-    const QVector<Enemy *> enemies = m_gameManager->currentEncounterEnemies();
-    if (enemies.isEmpty()) {
+    m_gameManager->startCombat();
+    if (battleFsm() == nullptr || battleFsm()->battleState() == BattleState::Idle) {
         return;
     }
 
-    // Only apply ShrinkDamagePower when the combat node is inside the shrink zone.
-    const int shrinkCount = m_gameManager->mapManager()->combatShrinkCount();
-    QVector<Actor *> battleEnemies;
-    battleEnemies.reserve(enemies.size());
-    for (Enemy *enemy : enemies) {
-        if (enemy != nullptr) {
-            battleEnemies.append(enemy);
-        }
-    }
-    m_gameManager->relicManager()->setBattleContext(m_battleFsm, battleEnemies);
-    m_battleFsm->startCombat(m_gameManager->player(), enemies, shrinkCount);
     m_combatActive = true;
     connectPlayerSignals();
     connectEnemySignals();
@@ -504,18 +472,13 @@ void BattleViewModel::startCombat()
 
 void BattleViewModel::playCard(const QString &cardId, int enemyIndex, int handIndex)
 {
-    if (!m_combatActive || m_gameManager == nullptr || m_gameManager->player() == nullptr
-        || m_battleFsm == nullptr) {
+    if (!m_combatActive || m_gameManager == nullptr || battleFsm() == nullptr) {
         return;
     }
 
-    if (m_battleFsm->battleState() != BattleState::PlayerTurn) {
-        return;
-    }
-
-    const QVector<Card> hand = m_battleFsm->hand();
     int indexToPlay = handIndex;
     if (indexToPlay < 0) {
+        const QVector<Card> hand = battleFsm()->hand();
         for (int i = 0; i < hand.size(); ++i) {
             if (hand.at(i).id() == cardId) {
                 indexToPlay = i;
@@ -524,53 +487,20 @@ void BattleViewModel::playCard(const QString &cardId, int enemyIndex, int handIn
         }
     }
 
-    if (indexToPlay < 0 || indexToPlay >= hand.size()) {
-        return;
+    const PlayResult result = m_gameManager->playCard(indexToPlay, enemyIndex);
+    if (!result.ok) {
+        qWarning() << "BattleViewModel: playCard failed:" << result.reason;
     }
-
-    const Card &card = hand.at(indexToPlay);
-    if (card.cost() < 0 || card.hasEffectType(QStringLiteral("unplayable"))) {
-        return;
-    }
-    if (card.cost() > m_battleFsm->currentEnergy()) {
-        return;
-    }
-
-    Actor *target = nullptr;
-    if (card.data().target == TargetType::Self) {
-        target = m_gameManager->player();
-    } else if (card.data().target == TargetType::AllEnemies) {
-        const QVector<Enemy *> enemies =
-            m_battleFsm != nullptr ? m_battleFsm->enemies()
-                                   : m_gameManager->currentEncounterEnemies();
-        for (Enemy *enemy : enemies) {
-            if (enemy != nullptr && enemy->currentHp() > 0) {
-                target = enemy;
-                break;
-            }
-        }
-        if (target == nullptr) {
-            return;
-        }
-    } else {
-        Enemy *enemy = enemyAtIndex(enemyIndex);
-        if (enemy == nullptr) {
-            return;
-        }
-        target = enemy;
-    }
-
-    m_battleFsm->playCard(card, target);
     refreshState();
 }
 
 void BattleViewModel::endPlayerTurn()
 {
-    if (!m_combatActive || m_battleFsm->battleState() != BattleState::PlayerTurn) {
+    if (!m_combatActive || m_gameManager == nullptr) {
         return;
     }
 
-    m_battleFsm->playerEndTurn();
+    m_gameManager->endPlayerTurn();
     refreshState();
 }
 
@@ -600,21 +530,11 @@ void BattleViewModel::refreshState()
 
 void BattleViewModel::connectEnemySignals()
 {
-    if (m_battleFsm == nullptr) {
+    if (battleFsm() == nullptr) {
         return;
     }
 
-    connect(m_battleFsm, &BattleFSM::enemiesChanged, this, [this]() {
-        if (m_gameManager != nullptr && m_gameManager->relicManager() != nullptr
-            && m_battleFsm != nullptr) {
-            QVector<Actor *> battleEnemies;
-            for (Enemy *enemy : m_battleFsm->enemies()) {
-                if (enemy != nullptr) {
-                    battleEnemies.append(enemy);
-                }
-            }
-            m_gameManager->relicManager()->setBattleContext(m_battleFsm, battleEnemies);
-        }
+    connect(battleFsm(), &BattleFSM::enemiesChanged, this, [this]() {
         connectEnemyHpSignals();
         refreshState();
     }, Qt::UniqueConnection);
@@ -625,7 +545,7 @@ void BattleViewModel::connectEnemySignals()
 void BattleViewModel::connectEnemyHpSignals()
 {
     const QVector<Enemy *> enemies =
-        m_battleFsm != nullptr ? m_battleFsm->enemies()
+        battleFsm() != nullptr ? battleFsm()->enemies()
                                : (m_gameManager != nullptr ? m_gameManager->currentEncounterEnemies()
                                                            : QVector<Enemy *>{});
     for (Enemy *enemy : enemies) {
@@ -634,8 +554,8 @@ void BattleViewModel::connectEnemyHpSignals()
                     Qt::UniqueConnection);
             connect(enemy, &Enemy::guardianModeChanged, this,
                     [this](bool) {
-                        if (m_battleFsm != nullptr) {
-                            m_battleFsm->refreshEnemyIntentPreview();
+                        if (battleFsm() != nullptr) {
+                            battleFsm()->refreshEnemyIntentPreview();
                         }
                         refreshState();
                     },
@@ -651,7 +571,7 @@ void BattleViewModel::checkCombatResolution()
     }
 
     const QVector<Enemy *> enemies =
-        m_battleFsm != nullptr ? m_battleFsm->enemies()
+        battleFsm() != nullptr ? battleFsm()->enemies()
                                : (m_gameManager != nullptr ? m_gameManager->currentEncounterEnemies()
                                                            : QVector<Enemy *>{});
     if (enemies.isEmpty()) {
@@ -675,15 +595,8 @@ void BattleViewModel::finishCombat(bool playerWon)
 
     m_combatActive = false;
 
-    if (m_battleFsm != nullptr && m_battleFsm->battleState() != BattleState::Ended) {
-        m_battleFsm->concludeCombat(playerWon);
-    }
-
     if (m_gameManager != nullptr) {
-        m_gameManager->relicManager()->clearBattleContext();
-    }
-    if (!playerWon && m_gameManager != nullptr) {
-        m_gameManager->clearCombatEncounter();
+        m_gameManager->finishCombat(playerWon);
     }
     emit combatActiveChanged();
     emit combatEnded(playerWon);
@@ -705,7 +618,11 @@ void BattleViewModel::connectPlayerSignals()
 
 void BattleViewModel::connectBattleFsm()
 {
-    connect(m_battleFsm, &BattleFSM::combatEnded, this, [this](bool playerWon) {
+    if (battleFsm() == nullptr) {
+        return;
+    }
+
+    connect(battleFsm(), &BattleFSM::combatEnded, this, [this](bool playerWon) {
         finishCombat(playerWon);
     });
 }

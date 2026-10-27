@@ -129,7 +129,7 @@ QString describeEffect(const EffectDef &effect, TargetType cardTarget)
     }
 
     qWarning("CardText: unknown effect type \"%s\"", qPrintable(type));
-    return titleCaseId(type);
+    return {};
 }
 
 QString describeCard(const Card &card)

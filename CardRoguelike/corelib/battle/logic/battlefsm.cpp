@@ -76,6 +76,33 @@ QVector<Enemy *> BattleFSM::enemies() const
     return m_enemies;
 }
 
+void BattleFSM::adoptEncounter(std::vector<std::unique_ptr<Enemy>> enemies)
+{
+    m_encounterOwned = std::move(enemies);
+}
+
+void BattleFSM::releaseEncounter()
+{
+    if (m_shrinkConnection) {
+        QObject::disconnect(m_shrinkConnection);
+        m_shrinkConnection = {};
+    }
+
+    clearShrinkPower();
+    m_enemies.clear();
+    m_ownedEnemies.clear();
+    m_encounterOwned.clear();
+    m_enemy = nullptr;
+    m_hand.clear();
+    m_drawPile.clear();
+    m_discardPile.clear();
+    m_exhaustPile.clear();
+    m_player = nullptr;
+    m_state = BattleState::Idle;
+    m_enemyIntent.clear();
+    m_enemyIntentValue = 0;
+}
+
 void BattleFSM::startCombat(Player *player, const QVector<Enemy *> &enemies, int shrinkCount)
 {
     if (player == nullptr || enemies.isEmpty()) {
@@ -478,10 +505,10 @@ void BattleFSM::endCombat(bool playerWon)
     emit combatEnded(playerWon);
 }
 
-void BattleFSM::playCard(Card card, Actor *target)
+PlayResult BattleFSM::playCard(Card card, Actor *target)
 {
     if (m_state != BattleState::PlayerTurn || m_player == nullptr || m_enemy == nullptr) {
-        return;
+        return PlayResult::failure(QStringLiteral("Not the player turn"));
     }
 
     int handIndex = -1;
@@ -493,16 +520,16 @@ void BattleFSM::playCard(Card card, Actor *target)
     }
 
     if (handIndex < 0) {
-        return;
+        return PlayResult::failure(QStringLiteral("Card is not in hand"));
     }
 
     const Card &handCard = m_hand.at(handIndex);
-    if (handCard.cost() < 0 || handCard.hasEffectType(QStringLiteral("unplayable"))) {
-        return;
+    if (!handCard.isPlayable()) {
+        return PlayResult::failure(QStringLiteral("Card cannot be played"));
     }
 
     if (m_currentEnergy < handCard.cost()) {
-        return;
+        return PlayResult::failure(QStringLiteral("Not enough energy"));
     }
 
     m_currentEnergy -= handCard.cost();
@@ -536,11 +563,12 @@ void BattleFSM::playCard(Card card, Actor *target)
         m_enemy = activeEnemy();
         if (m_enemy == nullptr) {
             endCombat(true);
-            return;
+            return PlayResult::success();
         }
     }
 
     updateEnemyIntentPreview();
+    return PlayResult::success();
 }
 
 QVector<Actor *> BattleFSM::livingEnemyActors() const

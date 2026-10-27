@@ -3,12 +3,16 @@
 #include <QtCore/QDebug>
 
 #include "battle/data/card_database.h"
+#include "battle/data/relic_database.h"
 #include "battle/entities/actor.h"
 #include "battle/entities/card.h"
 #include "battle/entities/player.h"
 #include "battle/entities/power.h"
 #include "battle/logic/battlefsm.h"
 #include "battle/logic/power_factory.h"
+#include "map/map_manager.h"
+#include "potions/potion_database.h"
+#include "utils/rng.h"
 
 DamageCommand::DamageCommand(Actor *source, Actor *target, int baseDamage)
     : m_source(source)
@@ -183,11 +187,13 @@ EffectResolver &EffectResolver::instance()
     return resolver;
 }
 
-void EffectResolver::execute(const QVector<EffectDef> &effects, Actor *caster, Actor *target,
+bool EffectResolver::execute(const QVector<EffectDef> &effects, Actor *caster, Actor *target,
                              const QVector<Actor *> &allEnemies, BattleFSM *battleFsm,
-                             const QString &sourceCardId)
+                             const QString &sourceCardId, MapManager *mapManager,
+                             int selectedDeckIndex, bool stopOnDeath)
 {
     std::vector<std::unique_ptr<ICommand>> commands;
+    bool interrupted = false;
 
     for (const EffectDef &effect : effects) {
         if (effect.type == QStringLiteral("deal_damage")) {
@@ -226,7 +232,110 @@ void EffectResolver::execute(const QVector<EffectDef> &effects, Actor *caster, A
             }
         } else if (effect.type == QStringLiteral("lose_hp")) {
             if (caster != nullptr && effect.value > 0) {
-                caster->takeDirectDamage(effect.value);
+                if (stopOnDeath) {
+                    caster->takeDamage(effect.value);
+                } else {
+                    caster->takeDirectDamage(effect.value);
+                }
+            }
+        } else if (effect.type == QStringLiteral("lose_hp_percent")) {
+            if (caster != nullptr && effect.value > 0) {
+                const int damage = (caster->maxHp() * effect.value) / 100;
+                if (damage > 0) {
+                    caster->takeDamage(damage);
+                }
+            }
+        } else if (effect.type == QStringLiteral("gain_random_relic")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                RelicDatabase::instance().load();
+                const QString relicId = RelicDatabase::instance().randomRelicIdExcluding(player->relicIds());
+                if (!relicId.isEmpty()) {
+                    player->addRelicId(relicId);
+                }
+            }
+        } else if (effect.type == QStringLiteral("add_steps")) {
+            if (mapManager != nullptr) {
+                mapManager->addSteps(effect.value);
+            }
+        } else if (effect.type == QStringLiteral("lose_gold")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                if (player->gold() < effect.value) {
+                    interrupted = true;
+                } else {
+                    player->setGold(player->gold() - effect.value);
+                }
+            }
+        } else if (effect.type == QStringLiteral("lose_gold_random")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                const int minGold = effect.value;
+                const int maxGold = effect.duration >= minGold ? effect.duration : minGold;
+                const int loss = RNG::get(minGold, maxGold);
+                player->setGold(qMax(0, player->gold() - loss));
+            }
+        } else if (effect.type == QStringLiteral("gain_potion")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                const QString potionId =
+                    effect.target.isEmpty() ? QStringLiteral("blood_potion") : effect.target;
+                const int count = effect.value > 0 ? effect.value : 1;
+                player->addPotion(potionId, count);
+            }
+        } else if (effect.type == QStringLiteral("gain_random_potion")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                PotionDatabase::instance().load();
+                const QStringList potionIds = PotionDatabase::instance().allPotionIds();
+                if (!potionIds.isEmpty()) {
+                    const int count = effect.value > 0 ? effect.value : 1;
+                    for (int i = 0; i < count; ++i) {
+                        const int index = RNG::get(0, potionIds.size() - 1);
+                        player->addPotion(potionIds.at(index), 1);
+                    }
+                }
+            }
+        } else if (effect.type == QStringLiteral("add_card")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                CardDatabase::instance().load();
+                const QString cardId = effect.target.isEmpty() ? effect.cardId : effect.target;
+                if (!cardId.isEmpty()) {
+                    const Card card = CardDatabase::instance().getCard(cardId);
+                    if (!card.id().isEmpty()) {
+                        player->addCardToDeck(card);
+                    }
+                }
+            }
+        } else if (effect.type == QStringLiteral("remove_card")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                if (!player->removeCardAt(selectedDeckIndex)) {
+                    interrupted = true;
+                }
+            }
+        } else if (effect.type == QStringLiteral("upgrade_card")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                if (!player->upgradeCard(selectedDeckIndex)) {
+                    interrupted = true;
+                }
+            }
+        } else if (effect.type == QStringLiteral("transform_card")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                if (!player->transformCardAt(selectedDeckIndex)) {
+                    interrupted = true;
+                }
+            }
+        } else if (effect.type == QStringLiteral("upgrade_random_cards")) {
+            if (auto *player = qobject_cast<Player *>(caster)) {
+                CardDatabase::instance().load();
+                QVector<int> upgradeable;
+                for (int i = 0; i < player->deck().size(); ++i) {
+                    if (CardDatabase::instance().canUpgrade(player->deck().at(i).id())) {
+                        upgradeable.append(i);
+                    }
+                }
+                int remaining = effect.value > 0 ? effect.value : 1;
+                while (remaining > 0 && !upgradeable.isEmpty()) {
+                    const int pick = RNG::get(0, upgradeable.size() - 1);
+                    const int deckIndex = upgradeable.takeAt(pick);
+                    player->upgradeCard(deckIndex);
+                    --remaining;
+                }
             }
         } else if (effect.type == QStringLiteral("draw_cards")
                    || effect.type == QStringLiteral("draw_card")) {
@@ -289,6 +398,14 @@ void EffectResolver::execute(const QVector<EffectDef> &effects, Actor *caster, A
         } else {
             qWarning() << "EffectResolver: unsupported effect type" << effect.type;
         }
+
+        if (interrupted) {
+            break;
+        }
+        if (stopOnDeath && caster != nullptr && caster->currentHp() <= 0) {
+            interrupted = true;
+            break;
+        }
     }
 
     for (const auto &command : commands) {
@@ -296,4 +413,9 @@ void EffectResolver::execute(const QVector<EffectDef> &effects, Actor *caster, A
             command->execute();
         }
     }
+
+    if (stopOnDeath && caster != nullptr && caster->currentHp() <= 0) {
+        return false;
+    }
+    return !interrupted;
 }

@@ -38,13 +38,7 @@ signals:
     void offersChanged();
 
 private:
-    static bool rollPercent(int percent);
-    static QStringList loadPotionIdsFromResources();
-    static QString randomCardId();
-    static QString randomPotionId();
-    static QString randomRelicId(const QStringList &ownedIds);
-
-    void generateRewards();
+    void refreshFromGameManager();
 
     GameManager *m_gameManager = nullptr;
     QVector<RewardOffer> m_offers;

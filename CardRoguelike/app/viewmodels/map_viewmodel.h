@@ -47,7 +47,9 @@ public:
     Q_INVOKABLE void startNewGame();
     Q_INVOKABLE void selectStartNode(int x, int y);
     Q_INVOKABLE void movePlayer(int x, int y);
-    Q_INVOKABLE void handleCampfireChoice(int choice, int deckIndex = -1);
+    Q_INVOKABLE void restAtCampfire();
+    Q_INVOKABLE void upgradeAtCampfire(int deckIndex);
+    Q_INVOKABLE void returnFromCombatReward();
     Q_INVOKABLE void executeEventOption(const EventData &eventData, int optionIndex,
                                         int selectedDeckIndex = -1);
     Q_INVOKABLE void markCurrentNodeExplored();

@@ -111,7 +111,7 @@ public:
     int discardPileCount() const;
     bool combatActive() const;
     bool canSelectCards() const;
-    bool canAffordCard(int cost) const;
+    bool canAffordCard(int handIndex) const;
 
 
 
@@ -205,11 +205,11 @@ private:
     static QVariantList buildBuffEntries(const Actor *actor);
     static QVariantMap buffEntryFromPower(class Power *power);
 
+    BattleFSM *battleFsm() const;
+
 
 
     GameManager *m_gameManager = nullptr;
-
-    BattleFSM *m_battleFsm = nullptr;
 
     bool m_combatActive = false;
 

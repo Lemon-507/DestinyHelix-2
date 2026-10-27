@@ -7,11 +7,15 @@
 #include <memory>
 #include <vector>
 
+#include "battle/logic/play_result.h"
+#include "economy/run_economy.h"
 #include "events/event_database.h"
+#include "potions/potion_database.h"
 #include "events/event_manager.h"
 #include "map/map_manager.h"
 #include "save/game_state.h"
 
+class BattleFSM;
 class Enemy;
 class Player;
 class RelicManager;
@@ -37,6 +41,18 @@ public:
 
     int shopDeletionCount() const;
     void incrementShopDeletionCount();
+    int cardDeletionPrice() const;
+    bool hasDeletedCardThisShopVisit() const;
+    bool canDeleteCardAtShop() const;
+
+    void rollShopStock();
+    const ShopStock &shopStock() const;
+    TransactionResult purchaseShopOffer(ShopOfferKind kind, int index);
+    TransactionResult deleteCardAtShop(int deckIndex);
+
+    void rollRewards();
+    const QVector<RewardOfferData> &rewardOffers() const;
+    bool claimReward(int index);
 
     MapManager *mapManager();
     Player *player();
@@ -49,6 +65,13 @@ public:
     QString bossEnemyId() const;
     void recordCombatVictory();
     void clearCombatEncounter();
+
+    void startCombat();
+    PlayResult playCard(int handIndex, int enemyIndex);
+    void endPlayerTurn();
+    PlayResult usePotion(const QString &potionId, int enemyIndex);
+    void finishCombat(bool playerWon);
+    BattleFSM *battleFsm() const;
 
     GameState buildGameState() const;
     void applyGameState(const GameState &state);
@@ -73,12 +96,18 @@ private:
     void connectMapSignals();
     void registerPlayerRelics();
     void syncPlayerRelics();
+    void updateRelicBattleContext();
+    GameContext potionContext() const;
 
     MapManager m_mapManager;
     EventManager m_eventManager;
     std::unique_ptr<Player> m_player;
     std::unique_ptr<RelicManager> m_relicManager;
+    std::unique_ptr<BattleFSM> m_battleFsm;
     std::vector<std::unique_ptr<Enemy>> m_encounterEnemies;
+    ShopStock m_shopStock;
+    QVector<RewardOfferData> m_rewardOffers;
+    bool m_shopDeletedThisVisit = false;
     int m_mapSeed = 0;
     int m_normalNodesCleared = 0;
     int m_shopDeletionCount = 0;

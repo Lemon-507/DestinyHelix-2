@@ -77,6 +77,7 @@ public:
     bool matches(const Card &other) const;
     bool canUpgrade() const;
     bool isUpgraded() const;
+    bool isPlayable() const;
     bool hasEffectType(const QString &effectType) const;
     int effectValue(const QString &effectType) const;
 

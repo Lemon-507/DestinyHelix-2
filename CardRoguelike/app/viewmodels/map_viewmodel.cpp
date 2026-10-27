@@ -269,20 +269,36 @@ void MapViewModel::movePlayer(int x, int y)
     emit gridDataChanged();
 }
 
-void MapViewModel::handleCampfireChoice(int choice, int deckIndex)
+void MapViewModel::restAtCampfire()
 {
     if (m_gameManager == nullptr) {
         return;
     }
 
-    if (choice == 0) {
-        m_gameManager->campfireHeal();
-    } else if (choice == 1 && deckIndex >= 0) {
-        m_gameManager->campfireUpgradeCard(deckIndex);
-    }
-
+    m_gameManager->campfireHeal();
     markCurrentNodeExplored();
     emit playerStatsChanged();
+}
+
+void MapViewModel::upgradeAtCampfire(int deckIndex)
+{
+    if (m_gameManager == nullptr || deckIndex < 0) {
+        return;
+    }
+
+    m_gameManager->campfireUpgradeCard(deckIndex);
+    markCurrentNodeExplored();
+    emit playerStatsChanged();
+}
+
+void MapViewModel::returnFromCombatReward()
+{
+    if (m_gameManager == nullptr) {
+        return;
+    }
+
+    m_gameManager->recordCombatVictory();
+    markCurrentNodeExplored();
 }
 
 void MapViewModel::executeEventOption(const EventData &eventData, int optionIndex,
